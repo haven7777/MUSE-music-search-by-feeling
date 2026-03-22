@@ -2,26 +2,165 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Static design tokens ───────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-void: #080810;
+  --surface-1: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.08);
+  --text-primary: #fafafa;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+
+  /* Dynamic — overridden per mood by colorSystem.ts */
+  --muse-primary: #8b5cf6;
+  --muse-secondary: #06b6d4;
+  --muse-bg: #080810;
+  --muse-text: #fafafa;
+  --muse-surface: #111118;
+
+  /* Smooth palette transitions */
+  transition:
+    background-color 0.8s ease,
+    color 0.8s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ───────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
 }
 
+html,
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  background: var(--muse-bg);
+  color: var(--muse-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes museBreath {
+  0% {
+    background-position: 0% 50%;
   }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+/* Waveform bar animations — 6 bars with staggered timing */
+@keyframes waveform1 {
+  from { height: 4px; }
+  to   { height: 14px; }
+}
+@keyframes waveform2 {
+  from { height: 8px; }
+  to   { height: 12px; }
+}
+@keyframes waveform3 {
+  from { height: 5px; }
+  to   { height: 14px; }
+}
+@keyframes waveform4 {
+  from { height: 9px; }
+  to   { height: 6px; }
+}
+@keyframes waveform5 {
+  from { height: 4px; }
+  to   { height: 13px; }
+}
+@keyframes waveform6 {
+  from { height: 11px; }
+  to   { height: 5px; }
+}
+
+/* ── Component classes ──────────────────────────────────────── */
+.animate-muse-breath {
+  animation: museBreath 14s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 400px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.track-card {
+  padding: 1rem;
+  border-radius: 20px;
+  background: var(--muse-surface);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.track-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  will-change: transform;
+}
+
+/* ── Accessibility: global focus ring ──────────────────────── */
+:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove default outline only when we have focus-visible */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Keyboard nav: audio player progress bar seek */
+[role='progressbar']:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, var(--muse-primary), var(--muse-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
