@@ -29,19 +29,61 @@ export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading
       {/* Column header */}
       <div className="mb-1">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: dotColor }} />
-          <h2
-            className={`text-[0.7rem] font-mono font-bold uppercase tracking-[0.15em] ${isUnderground ? 'italic' : ''}`}
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            {title}
-          </h2>
+          {/* Thin vertical bar */}
+          <div
+            style={{
+              width: '2px',
+              height: '18px',
+              background: dotColor,
+              borderRadius: '1px',
+              flexShrink: 0,
+            }}
+          />
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h2
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  fontSize: '0.65rem',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text-muted)',
+                  fontWeight: 400,
+                }}
+              >
+                {title}
+              </h2>
+              {tracks.length > 0 && (
+                <span
+                  style={{
+                    fontFamily: 'var(--font-geist-mono)',
+                    fontSize: '0.62rem',
+                    letterSpacing: '0.1em',
+                    color: 'var(--text-muted)',
+                    opacity: 0.6,
+                  }}
+                >
+                  ({tracks.length} tracks)
+                </span>
+              )}
+            </div>
+            {isUnderground && (
+              <p
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  fontSize: '0.58rem',
+                  letterSpacing: '0.1em',
+                  color: 'var(--text-muted)',
+                  opacity: 0.55,
+                  marginTop: '0.15rem',
+                  textTransform: 'uppercase',
+                }}
+              >
+                Independent · Audius
+              </p>
+            )}
+          </div>
         </div>
-        {isUnderground && (
-          <p className="text-[0.62rem] font-mono mt-0.5 ml-4" style={{ color: 'var(--text-muted)' }}>
-            Independent artists · Audius
-          </p>
-        )}
       </div>
 
       <div className="flex flex-col gap-3">

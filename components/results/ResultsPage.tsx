@@ -56,12 +56,14 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-5xl mx-auto flex flex-col gap-10">
         {/* Moment Card */}
-        <MomentCard
-          originalInput={originalInput}
-          vibeProfile={vibeProfile}
-          onSave={handleSave}
-          isSaved={isSaved}
-        />
+        <div style={{ paddingBottom: '1rem' }}>
+          <MomentCard
+            originalInput={originalInput}
+            vibeProfile={vibeProfile}
+            onSave={handleSave}
+            isSaved={isSaved}
+          />
+        </div>
 
         {/* Playlist columns */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -71,6 +73,24 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
             tracks={spotifyDeduped}
             vibeProfile={vibeProfile}
           />
+
+          {/* Mobile section divider — only visible below lg breakpoint */}
+          <div className="lg:hidden flex items-center gap-3 my-2">
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
+            <span
+              style={{
+                fontFamily: 'var(--font-geist-mono)',
+                fontSize: '0.6rem',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                color: 'var(--text-muted)',
+              }}
+            >
+              Underground
+            </span>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
+          </div>
+
           <PlaylistColumn
             title="From the Underground"
             dotColor="#CC0FE0"
@@ -80,14 +100,8 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
           />
         </div>
 
-        {/* Vibe Signature */}
-        <div
-          className="rounded-2xl p-8 flex justify-center border"
-          style={{
-            background: 'var(--muse-surface)',
-            borderColor: 'rgba(255,255,255,0.07)',
-          }}
-        >
+        {/* Vibe Signature — open, no card wrapper */}
+        <div className="flex justify-center py-8">
           <VibeSignature
             features={features}
             energyLevel={vibeProfile.energyLevel}

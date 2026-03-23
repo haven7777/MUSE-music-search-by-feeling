@@ -47,44 +47,73 @@ export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayer
   const total = isThisTrack && duration > 0 ? duration : durationMs / 1000
 
   return (
-    <div className="flex items-center gap-2 mt-2">
+    <div className="flex items-center gap-2.5 mt-2">
       <button
         onClick={handleToggle}
         aria-label={isThisPlaying ? `Pause ${title}` : `Play ${title}`}
-        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-95"
-        style={{ background: 'var(--muse-primary)' }}
+        className="flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-95"
+        style={{
+          width: '26px',
+          height: '26px',
+          borderRadius: '50%',
+          background: 'var(--muse-primary)',
+          boxShadow: isThisPlaying
+            ? '0 0 12px rgba(var(--muse-primary-rgb), 0.5)'
+            : 'none',
+          transition: 'box-shadow 0.3s ease',
+          border: 'none',
+          cursor: 'pointer',
+        }}
       >
         {isThisPlaying ? (
-          <Pause className="w-3 h-3 text-white" fill="white" />
+          <Pause style={{ width: '10px', height: '10px', color: 'white', fill: 'white' }} />
         ) : (
-          <Play className="w-3 h-3 text-white" fill="white" />
+          <Play style={{ width: '10px', height: '10px', color: 'white', fill: 'white' }} />
         )}
       </button>
 
-      <WaveformBars isPlaying={isThisPlaying} />
+      {isThisPlaying && <WaveformBars isPlaying={isThisPlaying} />}
 
+      {/* Interactive seekable progress bar */}
       <div
         ref={barRef}
         onClick={handleBarClick}
         onKeyDown={handleBarKeyDown}
         tabIndex={isThisTrack ? 0 : -1}
-        className="flex-1 h-1 rounded-full overflow-hidden cursor-pointer bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1"
+        className="flex-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(displayProgress * 100)}
         aria-label={`${title} progress — use arrow keys to seek`}
+        style={{
+          height: '4px',
+          background: 'rgba(255,255,255,0.1)',
+          borderRadius: '2px',
+          cursor: 'pointer',
+          overflow: 'hidden',
+        }}
       >
         <div
-          className="h-full rounded-full transition-all duration-100"
           style={{
+            height: '100%',
             width: `${displayProgress * 100}%`,
             background: 'var(--muse-primary)',
+            borderRadius: '2px',
+            transition: 'width 100ms linear',
           }}
         />
       </div>
 
-      <span className="text-[0.68rem] tabular-nums flex-shrink-0" style={{ color: 'var(--text-muted)' }}>
+      <span
+        className="flex-shrink-0"
+        style={{
+          fontFamily: 'var(--font-geist-mono)',
+          fontSize: '0.65rem',
+          color: 'var(--text-muted)',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
         {formatDuration(elapsed * 1000)} / {formatDuration(total * 1000)}
       </span>
     </div>

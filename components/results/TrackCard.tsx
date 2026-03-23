@@ -72,6 +72,7 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
         padding: 0,
         overflow: 'hidden',
         cursor: 'pointer',
+        position: 'relative',
         borderLeftColor: isThisPlaying
           ? 'var(--muse-primary)'
           : isExpanded
@@ -81,12 +82,35 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
         willChange: 'transform',
       }}
     >
-      {/* ── Main card content ──────────────────────────────────── */}
+      {/* Pulsing glow dot on left edge when playing */}
+      {isThisPlaying && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '-1px',
+            transform: 'translateY(-50%)',
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: 'var(--muse-primary)',
+            animation: 'pulseGlow 2s ease-in-out infinite',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      {/* Main card content */}
       <div style={{ padding: '1rem' }}>
         <div className="flex gap-3">
 
-          {/* Artwork */}
-          <div className="relative flex-shrink-0 w-[72px] h-[72px] rounded-xl overflow-hidden">
+          {/* Artwork — 64x64 */}
+          <div
+            className="relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden"
+            style={{
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px var(--glass-border), 0 8px 24px var(--glow-primary-ambient)',
+            }}
+          >
             {coverArt ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -139,8 +163,14 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
               <div className="flex-shrink-0 flex items-center gap-1.5">
                 {!isSpotify && (
                   <span
-                    className="text-[0.6rem] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
                     style={{
+                      fontFamily: 'var(--font-geist-mono)',
+                      fontSize: '0.6rem',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      padding: '0.15rem 0.4rem',
+                      borderRadius: '4px',
                       background: 'color-mix(in srgb, #CC0FE0 20%, transparent)',
                       color: '#CC0FE0',
                       border: '1px solid color-mix(in srgb, #CC0FE0 30%, transparent)',
@@ -150,7 +180,13 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
                   </span>
                 )}
                 {audiusTrack && (
-                  <span className="text-[0.65rem] font-mono" style={{ color: 'var(--text-muted)' }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-geist-mono)',
+                      fontSize: '0.65rem',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
                     {formatCount(audiusTrack.playCount)} plays
                   </span>
                 )}
@@ -192,7 +228,7 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
           </div>
         </div>
 
-        {/* ── "Tap to see why" hint — disappears when panel is open ── */}
+        {/* "Tap to see why" hint — disappears when panel is open */}
         <AnimatePresence initial={false}>
           {!isExpanded && (
             <motion.div
@@ -227,7 +263,7 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
         </AnimatePresence>
       </div>
 
-      {/* ── AI analysis panel ─────────────────────────────────── */}
+      {/* AI analysis panel */}
       <AnimatePresence initial={false}>
         {isExpanded && (
           <motion.div

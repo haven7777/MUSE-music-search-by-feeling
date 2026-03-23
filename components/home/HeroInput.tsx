@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, Send } from 'lucide-react'
-import { motion, useAnimation } from 'framer-motion'
+import { Send } from 'lucide-react'
+import { motion, useAnimation, AnimatePresence } from 'framer-motion'
 import { TypewriterPlaceholder } from './TypewriterPlaceholder'
 
 interface HeroInputProps {
@@ -71,29 +71,35 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
   const charPercent = Math.min((value.length / 500) * 100, 100)
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={handleSubmit} style={{ width: 'min(680px, 90vw)', margin: '0 auto' }}>
+      {/* Textarea container */}
       <motion.div
         animate={controls}
-        className="relative rounded-3xl transition-all duration-300"
         style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: `1px solid ${focused ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)'}`,
+          background: focused ? 'var(--glass-2)' : 'var(--glass-1)',
+          border: focused
+            ? '1px solid color-mix(in srgb, var(--muse-primary) 60%, transparent)'
+            : '1px solid var(--glass-border)',
+          borderRadius: '20px',
           boxShadow: focused
-            ? `0 0 0 3px color-mix(in srgb, var(--muse-primary) 18%, transparent),
-               0 0 40px color-mix(in srgb, var(--muse-primary) 8%, transparent)`
+            ? `0 0 0 1px rgba(var(--muse-primary-rgb), 0.3),
+               0 0 20px rgba(var(--muse-primary-rgb), 0.15),
+               0 0 60px rgba(var(--muse-primary-rgb), 0.08),
+               0 8px 32px rgba(0,0,0,0.4)`
             : 'none',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <div className="relative">
           {!value && !focused && (
-            <div className="absolute inset-0 px-6 py-5 pointer-events-none text-[1.05rem] leading-relaxed">
+            <div className="absolute inset-0 pointer-events-none" style={{ padding: '1.25rem 1.5rem', fontSize: '1rem', lineHeight: '1.7' }}>
               <TypewriterPlaceholder visible={!value && !focused} />
             </div>
           )}
           {!value && focused && (
             <div
-              className="absolute inset-0 px-6 py-5 pointer-events-none text-[1.05rem] leading-relaxed"
-              style={{ color: 'var(--text-muted)' }}
+              className="absolute inset-0 pointer-events-none"
+              style={{ padding: '1.25rem 1.5rem', fontSize: '1rem', lineHeight: '1.7', color: 'var(--text-muted)' }}
             >
               Describe your feeling or moment...
             </div>
@@ -108,13 +114,21 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
             rows={2}
             maxLength={500}
             aria-label="Describe what you're feeling right now"
-            className="w-full px-6 py-5 bg-transparent resize-none outline-none text-[1.05rem] leading-relaxed min-h-[80px] focus-visible:outline-none"
-            style={{ color: 'var(--muse-text)', caretColor: 'var(--muse-primary)' }}
+            className="w-full bg-transparent resize-none outline-none focus-visible:outline-none"
+            style={{
+              padding: '1.25rem 1.5rem',
+              fontSize: '1rem',
+              minHeight: '80px',
+              maxHeight: '160px',
+              color: 'var(--muse-text)',
+              caretColor: 'var(--muse-primary)',
+              lineHeight: '1.7',
+            }}
           />
         </div>
 
-        {/* Footer row */}
-        <div className="flex items-center justify-between px-4 pb-3 gap-3">
+        {/* Footer row inside textarea container */}
+        <div className="flex items-center justify-between gap-3" style={{ padding: '0 1rem 0.75rem' }}>
           <div className="flex items-center gap-3 flex-1">
             {/* Char progress bar */}
             {value.length > 0 && (
@@ -128,7 +142,10 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
                     }}
                   />
                 </div>
-                <span className="text-[0.68rem] font-mono tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                <span
+                  className="text-[0.68rem] tabular-nums"
+                  style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
+                >
                   {value.length}/500
                 </span>
               </div>
@@ -143,31 +160,78 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showHint && value.length > 0 ? 0.5 : 0 }}
-                className="text-[0.68rem] font-mono hidden sm:block"
-                style={{ color: 'var(--text-muted)' }}
+                className="text-[0.68rem] hidden sm:block"
+                style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
               >
                 Press Enter to discover
               </motion.span>
             )}
           </div>
 
-          {/* Submit button — icon on mobile, full on desktop */}
+          {/* Icon-only submit for mobile / secondary form submit */}
           <button
             type="submit"
             disabled={!canSubmit}
+            aria-hidden="true"
+            tabIndex={-1}
             aria-label="Find my soundtrack"
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[0.78rem] font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-105 active:scale-95 disabled:opacity-0 sm:hidden"
             style={{
-              background: canSubmit ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
+              background: canSubmit ? 'var(--muse-primary)' : 'transparent',
               color: 'white',
             }}
           >
-            <span className="hidden sm:inline">{isLoading ? 'Finding…' : 'Find my soundtrack'}</span>
-            {!isLoading && <ArrowRight className="w-3.5 h-3.5 hidden sm:block" />}
-            <Send className="w-4 h-4 sm:hidden" />
+            <Send className="w-3.5 h-3.5" />
           </button>
         </div>
       </motion.div>
+
+      {/* Pill submit button — centered below the textarea, fades in when canSubmit */}
+      <AnimatePresence>
+        {canSubmit && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            className="flex justify-center"
+            style={{ marginTop: '1rem' }}
+          >
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className="transition-all focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              style={{
+                background: 'var(--muse-primary)',
+                borderRadius: '50px',
+                padding: '0.65rem 1.75rem',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                letterSpacing: '0.02em',
+                color: 'white',
+                boxShadow: '0 4px 24px var(--glow-primary-soft)',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
+                ;(e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  '0 8px 32px var(--glow-primary-soft)'
+              }}
+              onMouseLeave={(e) => {
+                ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
+                ;(e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  '0 4px 24px var(--glow-primary-soft)'
+              }}
+              onMouseDown={(e) => {
+                ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
+              }}
+            >
+              {isLoading ? 'Finding…' : 'Feel the music →'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </form>
   )
 }

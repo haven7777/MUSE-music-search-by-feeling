@@ -6,20 +6,35 @@ interface WaveformBarsProps {
 }
 
 export function WaveformBars({ isPlaying, color }: WaveformBarsProps) {
-  const bars = [0.4, 0.7, 1.0, 0.6, 0.85, 0.5]
+  // Heights in px when paused (frozen at mid-height)
+  const bars = [
+    { height: 12, duration: '0.7s', delay: '0s' },
+    { height: 18, duration: '0.5s', delay: '0.1s' },
+    { height: 14, duration: '0.9s', delay: '0.05s' },
+    { height: 20, duration: '0.6s', delay: '0.15s' },
+    { height: 16, duration: '0.8s', delay: '0.08s' },
+  ]
 
   return (
-    <div className="flex items-center gap-[2px] h-4" aria-hidden="true">
-      {bars.map((baseHeight, i) => (
+    <div
+      className="flex items-end gap-[2px]"
+      style={{ height: '20px' }}
+      aria-hidden="true"
+    >
+      {bars.map((bar, i) => (
         <div
           key={i}
-          className="w-[3px] rounded-full transition-all"
           style={{
-            height: isPlaying ? undefined : `${Math.floor(baseHeight * 12)}px`,
+            width: '3px',
+            height: `${bar.height}px`,
+            borderRadius: '2px',
             background: color ?? 'var(--muse-primary)',
-            animation: isPlaying ? `waveform${i + 1} ${0.6 + i * 0.1}s ease-in-out infinite alternate` : 'none',
-            minHeight: '3px',
-            maxHeight: '14px',
+            transformOrigin: 'bottom',
+            animation: isPlaying
+              ? `waveBar ${bar.duration} ease-in-out ${bar.delay} infinite`
+              : 'none',
+            opacity: isPlaying ? 1 : 0.35,
+            transition: 'opacity 0.3s ease',
           }}
         />
       ))}

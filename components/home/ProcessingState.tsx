@@ -26,63 +26,83 @@ export function ProcessingState({ keywords }: ProcessingStateProps) {
     return () => intervals.forEach(clearTimeout)
   }, [])
 
+  const barHeights = [20, 35, 50, 45, 60, 40, 28]
+  const barDurations = ['0.6s', '0.9s', '0.7s', '1.1s', '0.8s', '1.0s', '0.65s']
+  const barDelays = ['0s', '0.1s', '0.2s', '0.15s', '0.05s', '0.25s', '0.3s']
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex flex-col items-center gap-8 py-12"
+      className="flex flex-col items-center gap-8 py-16"
     >
-      {/* Animated waveform orb */}
-      <div className="relative flex items-center justify-center w-32 h-32">
-        {[0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: 60 + i * 28,
-              height: 60 + i * 28,
-              background: `color-mix(in srgb, var(--muse-primary) ${18 - i * 5}%, transparent)`,
-              border: `1px solid color-mix(in srgb, var(--muse-primary) ${25 - i * 7}%, transparent)`,
-            }}
-            animate={{ scale: [1, 1.08, 1], opacity: [0.6, 0.25, 0.6] }}
-            transition={{ duration: 2.2, delay: i * 0.35, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        ))}
-        {/* Center waveform bars */}
-        <div className="relative z-10 flex items-center gap-[3px]">
-          {[0.5, 0.8, 1, 0.7, 0.9, 0.6, 1].map((h, i) => (
-            <motion.div
+      {/* Label above visualizer */}
+      <motion.p
+        animate={{ opacity: [0.35, 0.6, 0.35] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        style={{
+          fontFamily: 'var(--font-syne)',
+          fontWeight: 600,
+          fontSize: '0.82rem',
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.4)',
+          margin: 0,
+        }}
+      >
+        MUSE IS FEELING YOUR MOMENT
+      </motion.p>
+
+      {/* Equalizer visualizer */}
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+        {/* Ambient glow behind bars */}
+        <div
+          style={{
+            position: 'absolute',
+            width: '200px',
+            height: '200px',
+            background: 'radial-gradient(circle at center, var(--muse-primary) 15%, transparent 70%)',
+            opacity: 0.12,
+            filter: 'blur(18px)',
+            pointerEvents: 'none',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        />
+        <div
+          className="flex items-end gap-[3px]"
+          style={{ height: '64px', position: 'relative', zIndex: 1 }}
+        >
+          {barHeights.map((height, i) => (
+            <div
               key={i}
-              className="w-[4px] rounded-full"
-              style={{ background: 'var(--muse-primary)' }}
-              animate={{ scaleY: [h, h * 0.4, h] }}
-              transition={{
-                duration: 0.8,
-                delay: i * 0.1,
-                repeat: Infinity,
-                ease: 'easeInOut',
+              style={{
+                width: '4px',
+                height: `${height}px`,
+                borderRadius: '2px',
+                background: 'var(--muse-primary)',
+                transformOrigin: 'bottom',
+                animation: `waveBar ${barDurations[i]} ease-in-out ${barDelays[i]} infinite`,
               }}
-              initial={{ height: 20, originY: 0.5 }}
             />
           ))}
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-4 text-center">
-        <motion.p
-          className="text-lg font-medium"
-          style={{ color: 'var(--muse-text)' }}
-          animate={{ opacity: [0.7, 1, 0.7] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          MUSE is feeling your moment…
-        </motion.p>
-
+      <div className="flex flex-col items-center gap-4">
         {/* Progress bar */}
-        <div className="w-48 h-[2px] rounded-full bg-white/10 overflow-hidden">
+        <div
+          style={{
+            width: '180px',
+            height: '2px',
+            background: 'rgba(255,255,255,0.08)',
+            borderRadius: '1px',
+            overflow: 'hidden',
+          }}
+        >
           <motion.div
-            className="h-full rounded-full"
-            style={{ background: 'var(--muse-primary)' }}
+            style={{ height: '100%', background: 'var(--muse-primary)', borderRadius: '1px' }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           />
@@ -97,10 +117,15 @@ export function ProcessingState({ keywords }: ProcessingStateProps) {
                 initial={{ opacity: 0, scale: 0.85, y: 4 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ delay: i * 0.12, duration: 0.3, ease: 'easeOut' }}
-                className="px-3 py-1 rounded-full text-[0.7rem] font-mono font-bold uppercase tracking-widest"
                 style={{
-                  background: 'color-mix(in srgb, var(--muse-primary) 15%, transparent)',
-                  border: '1px solid color-mix(in srgb, var(--muse-primary) 25%, transparent)',
+                  fontFamily: 'var(--font-geist-mono)',
+                  fontSize: '0.68rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.12em',
+                  padding: '0.3rem 0.7rem',
+                  border: '1px solid rgba(var(--muse-primary-rgb), 0.3)',
+                  background: 'rgba(var(--muse-primary-rgb), 0.08)',
+                  borderRadius: '4px',
                   color: 'var(--muse-primary)',
                 }}
               >

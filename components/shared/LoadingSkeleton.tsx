@@ -2,13 +2,21 @@
 
 export function TrackCardSkeleton() {
   return (
-    <div className="track-card flex gap-3 animate-pulse">
-      <div className="w-[72px] h-[72px] rounded-xl bg-white/10 flex-shrink-0" />
-      <div className="flex-1 flex flex-col gap-2 justify-center">
-        <div className="h-3 bg-white/10 rounded-full w-3/4" />
-        <div className="h-2.5 bg-white/10 rounded-full w-1/2" />
-        <div className="h-2 bg-white/10 rounded-full w-full mt-1" />
-        <div className="h-2 bg-white/10 rounded-full w-2/3" />
+    <div
+      className="track-card"
+      style={{ padding: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}
+    >
+      {/* Artwork placeholder */}
+      <div
+        className="skeleton-block flex-shrink-0"
+        style={{ width: '64px', height: '64px', borderRadius: '10px' }}
+      />
+      {/* Text lines */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.1rem' }}>
+        <div className="skeleton-block" style={{ height: '13px', width: '70%' }} />
+        <div className="skeleton-block" style={{ height: '11px', width: '45%' }} />
+        <div className="skeleton-block" style={{ height: '8px', width: '100%', marginTop: '4px' }} />
+        <div className="skeleton-block" style={{ height: '8px', width: '60%' }} />
       </div>
     </div>
   )

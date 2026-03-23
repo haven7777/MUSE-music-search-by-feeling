@@ -2,148 +2,216 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Static design tokens ───────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   MUSE DESIGN SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+
 :root {
-  --bg-void: #080810;
-  --surface-1: rgba(255, 255, 255, 0.04);
-  --surface-2: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.08);
+  /* ── Depth system — the z-axis of dark UI ── */
+  --depth-0: #04040a;
+  --depth-1: #080810;
+  --depth-2: #0d0d1a;
+  --depth-3: #12122a;
+  --depth-4: #1a1a35;
+  --depth-glow: rgba(139, 92, 246, 0.03);
+
+  /* ── Glass surfaces ── */
+  --glass-1: rgba(255, 255, 255, 0.03);
+  --glass-2: rgba(255, 255, 255, 0.05);
+  --glass-3: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-border-bright: rgba(255, 255, 255, 0.14);
+
+  /* ── Glow system ── */
+  --glow-primary: rgba(139, 92, 246, 0.4);
+  --glow-primary-soft: rgba(139, 92, 246, 0.15);
+  --glow-primary-ambient: rgba(139, 92, 246, 0.06);
+  --glow-white: rgba(255, 255, 255, 0.08);
+
+  /* ── Static text tokens ── */
   --text-primary: #fafafa;
   --text-secondary: #94a3b8;
   --text-muted: #475569;
 
-  /* Dynamic — overridden per mood by colorSystem.ts */
+  /* ── Legacy border token ── */
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* ── Typography scale ── */
+  --text-2xs: 0.65rem;
+  --text-xs: 0.72rem;
+  --text-sm: 0.82rem;
+  --text-base: 0.92rem;
+  --text-md: 1.05rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.75rem;
+  --text-4xl: 3.75rem;
+  --text-5xl: 5rem;
+
+  /* ── Spacing system (8px base) ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+
+  /* ── Dynamic mood palette — overridden by colorSystem.ts ── */
   --muse-primary: #8b5cf6;
-  --muse-primary-rgb: 139, 92, 246;
   --muse-secondary: #06b6d4;
   --muse-bg: #080810;
   --muse-text: #fafafa;
-  --muse-surface: #111118;
+  --muse-surface: #0d0d1a;
+  --muse-primary-rgb: 139, 92, 246;
 
-  /* Smooth palette transitions */
+  /* ── Palette transitions ── */
   transition:
     background-color 0.8s ease,
     color 0.8s ease;
 }
 
-/* ── Base ───────────────────────────────────────────────────── */
-* {
+/* ═══════════════════════════════════════════════════════════
+   KEYFRAMES
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px var(--glow-primary-soft); }
+  50% {
+    box-shadow:
+      0 0 40px var(--glow-primary),
+      0 0 80px var(--glow-primary-ambient);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes waveBar {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes museBreath {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes nowPlayingSlide {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Waveform bar animations — individual for stagger effect */
+@keyframes waveform1 { from { height: 4px; } to { height: 14px; } }
+@keyframes waveform2 { from { height: 8px; } to { height: 12px; } }
+@keyframes waveform3 { from { height: 5px; } to { height: 15px; } }
+@keyframes waveform4 { from { height: 9px; } to { height: 6px; } }
+@keyframes waveform5 { from { height: 4px; } to { height: 13px; } }
+@keyframes waveform6 { from { height: 11px; } to { height: 5px; } }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html,
 body {
   height: 100%;
-  background: var(--muse-bg);
-  color: var(--muse-text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--muse-bg, var(--depth-1));
+  color: var(--muse-text, var(--text-primary));
 }
 
-/* ── Keyframes ──────────────────────────────────────────────── */
-@keyframes museBreath {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+::selection {
+  background: var(--muse-primary);
+  color: #ffffff;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -400px 0;
-  }
-  100% {
-    background-position: 400px 0;
-  }
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--glass-3);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--muse-primary) 50%, transparent);
 }
 
-/* Waveform bar animations — 6 bars with staggered timing */
-@keyframes waveform1 {
-  from { height: 4px; }
-  to   { height: 14px; }
-}
-@keyframes waveform2 {
-  from { height: 8px; }
-  to   { height: 12px; }
-}
-@keyframes waveform3 {
-  from { height: 5px; }
-  to   { height: 14px; }
-}
-@keyframes waveform4 {
-  from { height: 9px; }
-  to   { height: 6px; }
-}
-@keyframes waveform5 {
-  from { height: 4px; }
-  to   { height: 13px; }
-}
-@keyframes waveform6 {
-  from { height: 11px; }
-  to   { height: 5px; }
-}
-
-/* ── Component classes ──────────────────────────────────────── */
-.animate-muse-breath {
-  animation: museBreath 14s ease-in-out infinite;
-  background-size: 200% 200%;
-}
-
-.animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.04) 100%
-  );
-  background-size: 400px 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-.track-card {
-  padding: 1rem;
-  border-radius: 20px;
-  background: var(--muse-surface);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.track-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  will-change: transform;
-}
-
-/* ── Accessibility: global focus ring ──────────────────────── */
+/* ── Focus ring — globally beautiful ── */
 :focus-visible {
-  outline: 2px solid #22d3ee;
-  outline-offset: 2px;
+  outline: 2px solid var(--muse-primary);
+  outline-offset: 3px;
   border-radius: 4px;
 }
 
-/* Remove default outline only when we have focus-visible */
 button:focus:not(:focus-visible),
 a:focus:not(:focus-visible),
 textarea:focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Keyboard nav: audio player progress bar seek */
 [role='progressbar']:focus-visible {
-  outline: 2px solid #22d3ee;
+  outline: 2px solid var(--muse-primary);
   outline-offset: 2px;
 }
 
-/* Gradient text utility */
+/* No text underlines except where explicitly added */
+a { text-decoration: none; }
+
+/* Tabular numbers everywhere they matter */
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ═══════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════ */
+
 .gradient-text {
   background: linear-gradient(135deg, var(--muse-primary), var(--muse-secondary));
   -webkit-background-clip: text;
@@ -151,17 +219,91 @@ textarea:focus:not(:focus-visible) {
   background-clip: text;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+.animate-muse-breath {
+  animation: museBreath 14s ease-in-out infinite;
+  background-size: 200% 200%;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+.animate-breathe {
+  animation: breathe 8s ease-in-out infinite;
 }
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--depth-2) 25%,
+    var(--depth-3) 50%,
+    var(--depth-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TRACK CARD
+   ═══════════════════════════════════════════════════════════ */
+
+.track-card {
+  position: relative;
+  border-radius: 16px;
+  background: var(--depth-2);
+  border: 1px solid var(--glass-border);
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Top-edge highlight — "lit from above" */
+.track-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  border-radius: 16px 16px 0 0;
+  pointer-events: none;
+}
+
+.track-card:hover {
+  background: var(--depth-3);
+  border-color: var(--glass-border-bright);
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 1px var(--glass-border-bright),
+    0 0 60px var(--glow-primary-ambient);
+  will-change: transform;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LOADING SKELETON
+   ═══════════════════════════════════════════════════════════ */
+
+.skeleton-block {
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--depth-2) 25%,
+    var(--depth-3) 50%,
+    var(--depth-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }

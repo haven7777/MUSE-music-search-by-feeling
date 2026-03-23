@@ -166,44 +166,74 @@ function HomePageInner() {
             <div className="absolute top-6 right-6">
               <Link
                 href="/moments"
-                className="text-[0.75rem] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-                style={{ color: 'var(--text-muted)' }}
+                className="text-[0.75rem] uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
+                style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
               >
                 Saved Moments
               </Link>
             </div>
 
             {/* Wordmark */}
-            <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="flex flex-col items-center gap-3 relative"
-            >
+            <div className="flex flex-col items-center relative" style={{ gap: '0.5rem' }}>
               {/* Ambient glow behind wordmark */}
               <div
                 className="absolute -inset-8 rounded-full pointer-events-none"
                 style={{
-                  background: 'radial-gradient(circle, color-mix(in srgb, var(--muse-primary) 12%, transparent) 0%, transparent 70%)',
+                  background:
+                    'radial-gradient(circle, color-mix(in srgb, var(--muse-primary) 12%, transparent) 0%, transparent 70%)',
                 }}
                 aria-hidden="true"
               />
+
               <h1
-                className="relative text-7xl font-extrabold tracking-tight gradient-text"
-                style={{ fontFamily: 'var(--font-syne)' }}
+                className="relative gradient-text"
+                style={{
+                  fontFamily: 'var(--font-syne)',
+                  fontSize: 'clamp(3.5rem, 8vw, 6rem)',
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1,
+                  animation: 'revealUp 0.6s cubic-bezier(0.4,0,0.2,1) both',
+                }}
               >
                 MUSE
               </h1>
+
+              {/* Decorative line */}
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.6, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                style={{
+                  height: '1px',
+                  width: '120px',
+                  background: 'linear-gradient(90deg, var(--muse-primary), transparent 50%, var(--muse-secondary))',
+                  transformOrigin: 'center',
+                  marginBottom: '0.5rem',
+                }}
+                aria-hidden="true"
+              />
+
+              {/* Tagline */}
               <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.7 }}
-                transition={{ delay: 0.5 }}
-                className="text-lg tracking-[0.08em]"
-                style={{ color: 'var(--text-secondary)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8, ease: [0.4, 0, 0.2, 1] }}
+                style={{
+                  fontSize: '1.05rem',
+                  letterSpacing: '0.01em',
+                  lineHeight: 1.5,
+                  textAlign: 'center',
+                }}
               >
-                Describe a feeling. Discover its soundtrack.
+                <span style={{ opacity: 0.5, fontWeight: 300, color: 'var(--text-secondary)' }}>
+                  Describe a feeling.
+                </span>
+                <span style={{ opacity: 0.85, fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  {' '}Discover its soundtrack.
+                </span>
               </motion.p>
-            </motion.div>
+            </div>
 
             {/* Input or Processing */}
             <div className="w-full max-w-2xl">
@@ -235,12 +265,16 @@ function HomePageInner() {
           >
             <div
               className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 border-b"
-              style={{ background: 'rgba(8,8,16,0.8)', backdropFilter: 'blur(12px)', borderColor: 'var(--border)' }}
+              style={{
+                background: 'rgba(4,4,10,0.85)',
+                backdropFilter: 'blur(20px)',
+                borderColor: 'var(--border)',
+              }}
             >
               <button
                 onClick={handleReset}
-                className="text-[0.75rem] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-                style={{ color: 'var(--text-muted)' }}
+                className="text-[0.75rem] uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
+                style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
               >
                 ← New Feeling
               </button>
@@ -249,8 +283,8 @@ function HomePageInner() {
               </span>
               <Link
                 href="/moments"
-                className="text-[0.75rem] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-                style={{ color: 'var(--text-muted)' }}
+                className="text-[0.75rem] uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
+                style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
               >
                 Moments
               </Link>
@@ -280,16 +314,37 @@ function HomePageInner() {
               {lastInput && (
                 <button
                   onClick={() => void handleSubmit(lastInput)}
-                  className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 focus-visible:ring-2 focus-visible:ring-cyan-400"
-                  style={{ background: 'var(--muse-primary)', color: 'white' }}
+                  className="transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
+                  style={{
+                    background: 'var(--muse-primary)',
+                    color: 'white',
+                    borderRadius: '50px',
+                    padding: '0.65rem 1.75rem',
+                    fontWeight: 600,
+                    fontSize: '0.9rem',
+                    letterSpacing: '0.02em',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 24px var(--glow-primary-soft)',
+                  }}
                 >
                   Try again
                 </button>
               )}
               <button
                 onClick={handleReset}
-                className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 focus-visible:ring-2 focus-visible:ring-cyan-400"
-                style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--text-secondary)' }}
+                className="transition-all focus-visible:ring-2 focus-visible:ring-cyan-400"
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  color: 'var(--text-secondary)',
+                  borderRadius: '50px',
+                  padding: '0.65rem 1.75rem',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  letterSpacing: '0.02em',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
               >
                 Rephrase
               </button>
