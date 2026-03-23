@@ -206,30 +206,47 @@ function applyArtistDiversity(pool: SpotifyTrackData[]): SpotifyTrackData[] {
   return diverse.slice(0, 8)
 }
 
+// Genre-based fallback queries when mood-specific searches return too few results
+function buildSpotifyFallback(vibeProfile: VibeProfile): string[] {
+  const genres = vibeProfile.spotifyGenres ?? ['indie', 'sad']
+  const core = vibeProfile.emotionalCore ?? ''
+  return [
+    ...genres.map((g) => `${g} ${core}`.trim()),
+    ...genres.map((g) => `${g} playlist`),
+    `${vibeProfile.moodLabel ?? ''} music`.trim(),
+  ].filter(Boolean).slice(0, 4)
+}
+
 export async function fetchSpotifyTracks(
   queries: string[],
   vibeProfile: VibeProfile,
 ): Promise<SpotifyTrackData[]> {
   const token = await getSpotifyToken()
 
-  // Primary: Spotify Recommendations API (acoustically matched, not keyword-matched)
-  const recommendedRaw = await getRecommendations(vibeProfile, token)
-
-  if (recommendedRaw.length >= 5) {
-    const allIds = recommendedRaw.map((t) => t.id)
-    const featuresMap = await getAudioFeatures(allIds, token)
-    const sorted = dedupeAndSort(recommendedRaw, featuresMap, vibeProfile)
-    return applyArtistDiversity(sorted)
-  }
-
-  // Fallback: text search + manual audio filter (for when recommendations API is unavailable)
+  // Collect from all search queries (recommendations API deprecated Nov 2024)
   const rawResults = await Promise.all(queries.map((q) => searchTracks(q, token)))
-  const allRaw = [...recommendedRaw]
+  const seen = new Set<string>()
+  const allRaw: SpotifyRawTrack[] = []
 
   for (const results of rawResults) {
     for (const track of results) {
-      if (!allRaw.find((t) => t.id === track.id)) {
+      if (!seen.has(track.id)) {
+        seen.add(track.id)
         allRaw.push(track)
+      }
+    }
+  }
+
+  // Broaden with fallback queries if we don't have enough candidates
+  if (allRaw.length < 16) {
+    const fallbackQueries = buildSpotifyFallback(vibeProfile)
+    const fallbackResults = await Promise.all(fallbackQueries.map((q) => searchTracks(q, token)))
+    for (const results of fallbackResults) {
+      for (const track of results) {
+        if (!seen.has(track.id)) {
+          seen.add(track.id)
+          allRaw.push(track)
+        }
       }
     }
   }
@@ -238,7 +255,7 @@ export async function fetchSpotifyTracks(
   const featuresMap = await getAudioFeatures(allIds, token)
   const sorted = dedupeAndSort(allRaw, featuresMap, vibeProfile)
   const filtered = filterByVibe(sorted, vibeProfile)
-  const pool = filtered.length >= 3 ? filtered : sorted
+  const pool = filtered.length >= 4 ? filtered : sorted
 
   return applyArtistDiversity(pool)
 }
