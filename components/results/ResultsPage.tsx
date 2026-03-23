@@ -9,6 +9,7 @@ import { savePlaylist, generateId } from '@/lib/storage'
 import { useToast } from '@/components/shared/Toast'
 import { PlaylistColumn } from './PlaylistColumn'
 import { VibeSignature } from './VibeSignature'
+import { TrackModal } from './TrackModal'
 
 interface ResultsPageProps {
   playlist: MusePlaylist
@@ -22,6 +23,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
   const [isSaved, setIsSaved] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('mainstream')
   const [showSignature, setShowSignature] = useState(false)
+  const [selectedTrack, setSelectedTrack] = useState<RankedTrack | null>(null)
   const { showToast } = useToast()
 
   useEffect(() => {
@@ -71,6 +73,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
   const energyDash = (energyLevel / 100) * circumference
 
   return (
+    <>
     <div className="min-h-screen pb-20">
       <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 1.5rem' }}>
 
@@ -338,6 +341,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                 tracks={spotifyDeduped}
                 vibeProfile={vibeProfile}
                 showHeader={false}
+                onOpenTrack={setSelectedTrack}
               />
             ) : (
               <PlaylistColumn
@@ -347,6 +351,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                 vibeProfile={vibeProfile}
                 isUnderground
                 showHeader={false}
+                onOpenTrack={setSelectedTrack}
               />
             )}
           </motion.div>
@@ -409,5 +414,17 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
 
       </div>
     </div>
+
+      {/* Track modal */}
+      <AnimatePresence>
+        {selectedTrack && (
+          <TrackModal
+            rankedTrack={selectedTrack}
+            vibeProfile={vibeProfile}
+            onClose={() => setSelectedTrack(null)}
+          />
+        )}
+      </AnimatePresence>
+    </>
   )
 }

@@ -1,4 +1,4 @@
-import { MusePlaylist } from '@/types'
+import { FavoriteTrack, MusePlaylist } from '@/types'
 
 const STORAGE_KEY = 'muse_moments'
 const MAX_PLAYLISTS = 50
@@ -61,4 +61,40 @@ export function clearAllPlaylists(): void {
 export function getPlaylistById(id: string): MusePlaylist | null {
   const all = getPlaylists()
   return all.find((p) => p.id === id) ?? null
+}
+
+// ── Favorite tracks ────────────────────────────────────────────────
+
+const FAVORITES_KEY = 'muse_favorites'
+
+export function getFavoriteTracks(): FavoriteTrack[] {
+  try {
+    if (typeof window === 'undefined') return []
+    const raw = localStorage.getItem(FAVORITES_KEY)
+    if (!raw) return []
+    return JSON.parse(raw) as FavoriteTrack[]
+  } catch {
+    return []
+  }
+}
+
+export function addFavoriteTrack(track: FavoriteTrack): void {
+  try {
+    if (typeof window === 'undefined') return
+    const existing = getFavoriteTracks()
+    if (existing.some((t) => t.id === track.id)) return
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify([track, ...existing]))
+  } catch { /* silent */ }
+}
+
+export function removeFavoriteTrack(id: string): void {
+  try {
+    if (typeof window === 'undefined') return
+    const updated = getFavoriteTracks().filter((t) => t.id !== id)
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated))
+  } catch { /* silent */ }
+}
+
+export function isFavoriteTrack(id: string): boolean {
+  return getFavoriteTracks().some((t) => t.id === id)
 }

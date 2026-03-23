@@ -72,8 +72,18 @@ export interface TrackCardProps {
   index: number
   vibeKeywords: string[]
   moodLabel: string
-  isExpanded: boolean
-  onExpand: () => void
+  onOpen: () => void
+}
+
+export interface FavoriteTrack {
+  id: string
+  source: 'spotify' | 'audius'
+  title: string
+  artist: string
+  coverArt: string
+  savedAt: number
+  spotifyUrl?: string
+  streamUrl?: string
 }
 
 export interface MusePlaylist {

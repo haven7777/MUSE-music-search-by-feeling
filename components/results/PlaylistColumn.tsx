@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { RankedTrack, VibeProfile } from '@/types'
 import { TrackCard } from './TrackCard'
 import { TrackCardSkeleton } from '@/components/shared/LoadingSkeleton'
@@ -13,15 +12,10 @@ interface PlaylistColumnProps {
   isLoading?: boolean
   isUnderground?: boolean
   showHeader?: boolean
+  onOpenTrack: (track: RankedTrack) => void
 }
 
-export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading, isUnderground, showHeader = true }: PlaylistColumnProps) {
-  const [expandedCardId, setExpandedCardId] = useState<string | null>(null)
-
-  function handleExpand(trackId: string) {
-    setExpandedCardId((prev) => (prev === trackId ? null : trackId))
-  }
-
+export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading, isUnderground, showHeader = true, onOpenTrack }: PlaylistColumnProps) {
   const vibeKeywords = vibeProfile.sonicTexture
   const moodLabel = vibeProfile.moodLabel
 
@@ -122,8 +116,7 @@ export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading
               index={i}
               vibeKeywords={vibeKeywords}
               moodLabel={moodLabel}
-              isExpanded={expandedCardId === track.track.id}
-              onExpand={() => handleExpand(track.track.id)}
+              onOpen={() => onOpenTrack(track)}
             />
           ))
         )}
