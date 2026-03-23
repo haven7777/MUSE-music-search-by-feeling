@@ -230,7 +230,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                 justifyContent: 'center',
                 gap: '0.5rem',
                 transition: 'all 0.2s ease',
-                color: activeTab === tab.key ? 'var(--muse-text)' : 'var(--text-muted)',
+                color: activeTab === tab.key ? '#ffffff' : 'rgba(255,255,255,0.55)',
                 fontFamily: 'var(--font-geist-sans)',
                 fontSize: '0.95rem',
                 fontWeight: activeTab === tab.key ? 600 : 400,
@@ -259,7 +259,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                       ? `${tab.color}22`
                       : 'var(--glass-1)',
                     border: `1px solid ${activeTab === tab.key ? `${tab.color}44` : 'var(--glass-border)'}`,
-                    color: activeTab === tab.key ? tab.color : 'var(--text-muted)',
+                    color: activeTab === tab.key ? tab.color : 'rgba(255,255,255,0.55)',
                     transition: 'all 0.2s ease',
                   }}
                 >
