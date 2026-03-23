@@ -67,6 +67,15 @@ export interface RankedTrack {
   track: SpotifyTrackData | AudiusTrack
 }
 
+export interface TrackCardProps {
+  rankedTrack: RankedTrack
+  index: number
+  vibeKeywords: string[]
+  moodLabel: string
+  isExpanded: boolean
+  onExpand: () => void
+}
+
 export interface MusePlaylist {
   id: string
   originalInput: string

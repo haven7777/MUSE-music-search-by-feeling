@@ -14,6 +14,7 @@
 
   /* Dynamic — overridden per mood by colorSystem.ts */
   --muse-primary: #8b5cf6;
+  --muse-primary-rgb: 139, 92, 246;
   --muse-secondary: #06b6d4;
   --muse-bg: #080810;
   --muse-text: #fafafa;

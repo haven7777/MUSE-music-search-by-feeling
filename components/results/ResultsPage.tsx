@@ -69,11 +69,13 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
             title="From the World"
             dotColor="#1DB954"
             tracks={spotifyDeduped}
+            vibeProfile={vibeProfile}
           />
           <PlaylistColumn
             title="From the Underground"
             dotColor="#CC0FE0"
             tracks={audiusDeduped}
+            vibeProfile={vibeProfile}
             isUnderground
           />
         </div>
