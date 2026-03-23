@@ -34,16 +34,20 @@ export function applyColorPalette(palette: ColorPalette): void {
   root.style.setProperty('--muse-text', palette.text)
   root.style.setProperty('--muse-surface', palette.surface)
 
-  // Blend the mood primary color into the page background
   const primaryRgb = hexToRgb(palette.primary)
   if (primaryRgb) {
-    root.style.setProperty('--muse-primary-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`)
-    // Build a tinted dark background using the primary color
     const { r, g, b } = primaryRgb
-    const bg = `rgb(${Math.round(r * 0.07)}, ${Math.round(g * 0.07)}, ${Math.round(b * 0.12 + 6)})`
+    root.style.setProperty('--muse-primary-rgb', `${r}, ${g}, ${b}`)
+    const bg = `rgb(${Math.round(r * 0.06)}, ${Math.round(g * 0.06)}, ${Math.round(b * 0.10 + 4)})`
     root.style.setProperty('--muse-bg', bg)
   } else {
     root.style.setProperty('--muse-bg', palette.background)
+  }
+
+  const secondaryRgb = hexToRgb(palette.secondary)
+  if (secondaryRgb) {
+    const { r, g, b } = secondaryRgb
+    root.style.setProperty('--muse-secondary-rgb', `${r}, ${g}, ${b}`)
   }
 }
 
