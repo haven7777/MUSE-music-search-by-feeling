@@ -143,7 +143,7 @@ function HomePageInner() {
     setPlaylist(null)
     setProcessingKeywords([])
     if (typeof document !== 'undefined') {
-      ;['--muse-primary', '--muse-secondary', '--muse-bg', '--muse-text', '--muse-surface'].forEach(
+      ;['--muse-primary', '--muse-secondary', '--muse-bg', '--muse-text', '--muse-surface', '--muse-primary-rgb', '--muse-secondary-rgb'].forEach(
         (v) => document.documentElement.style.removeProperty(v),
       )
     }
