@@ -101,27 +101,35 @@ export function MomentsGallery() {
             {!showClearConfirm ? (
               <button
                 onClick={() => setShowClearConfirm(true)}
-                className="flex items-center gap-1.5 text-[0.72rem] transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-                style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
+                className="flex items-center gap-1.5 transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full"
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  color: 'rgba(255,255,255,0.7)',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  padding: '0.35rem 0.85rem',
+                }}
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-3.5 h-3.5" />
                 Clear all
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <span className="text-[0.72rem]" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}>
+                <span className="text-[0.8rem]" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}>
                   Delete all {playlists.length} moments?
                 </span>
                 <button
                   onClick={handleClearAll}
-                  className="text-[0.72rem] px-2.5 py-1 rounded-full transition-all hover:opacity-90"
+                  className="text-[0.8rem] px-3 py-1.5 rounded-full transition-all hover:opacity-90 font-semibold"
                   style={{ fontFamily: 'var(--font-geist-mono)', background: '#ef4444', color: 'white' }}
                 >
                   Yes, clear
                 </button>
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="text-[0.72rem] px-2.5 py-1 rounded-full transition-all hover:opacity-80"
+                  className="text-[0.8rem] px-3 py-1.5 rounded-full transition-all hover:opacity-80 font-semibold"
                   style={{ fontFamily: 'var(--font-geist-mono)', background: 'rgba(255,255,255,0.1)', color: 'var(--text-secondary)' }}
                 >
                   Cancel
