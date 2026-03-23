@@ -28,7 +28,7 @@ interface SpotifyRawFeatures {
 }
 
 export async function searchTracks(query: string, token: string): Promise<SpotifyRawTrack[]> {
-  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`
+  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=15`
   const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
   if (!res.ok) return []
   const data = (await res.json()) as { tracks: { items: SpotifyRawTrack[] } }
@@ -191,19 +191,19 @@ function applyArtistDiversity(pool: SpotifyTrackData[]): SpotifyTrackData[] {
       seenArtists.add(primaryArtist)
       diverse.push(track)
     }
-    if (diverse.length >= 5) break
+    if (diverse.length >= 8) break
   }
 
-  if (diverse.length < 5) {
+  if (diverse.length < 8) {
     for (const track of pool) {
       if (!diverse.find((d) => d.id === track.id)) {
         diverse.push(track)
       }
-      if (diverse.length >= 5) break
+      if (diverse.length >= 8) break
     }
   }
 
-  return diverse.slice(0, 5)
+  return diverse.slice(0, 8)
 }
 
 export async function fetchSpotifyTracks(

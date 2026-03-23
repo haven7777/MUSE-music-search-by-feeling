@@ -70,7 +70,7 @@ function buildFallbackQueries(queries: string[]): string[] {
 }
 
 export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[]> {
-  const results = await Promise.all(queries.map((q) => searchAudiusTracks(q, 12)))
+  const results = await Promise.all(queries.map((q) => searchAudiusTracks(q, 20)))
 
   const seen = new Set<string>()
   const all: AudiusTrack[] = []
@@ -88,7 +88,7 @@ export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[
   if (all.length === 0) {
     const fallbackQueries = buildFallbackQueries(queries)
     const fallbackResults = await Promise.all(
-      fallbackQueries.map((q) => searchAudiusTracks(q, 8)),
+      fallbackQueries.map((q) => searchAudiusTracks(q, 15)),
     )
     for (const tracks of fallbackResults) {
       for (const track of tracks) {
@@ -110,7 +110,7 @@ export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[
       seenArtists.add(artistKey)
       diverse.push(track)
     }
-    if (diverse.length >= 5) break
+    if (diverse.length >= 8) break
   }
 
   return diverse
