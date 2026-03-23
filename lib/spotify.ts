@@ -28,8 +28,12 @@ interface SpotifyRawFeatures {
 }
 
 export async function searchTracks(query: string, token: string): Promise<SpotifyRawTrack[]> {
-  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+  const params = new URLSearchParams({ q: query, type: 'track', limit: '10' })
+  const url = `https://api.spotify.com/v1/search?${params.toString()}`
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  })
   if (!res.ok) return []
   const data = (await res.json()) as { tracks: { items: SpotifyRawTrack[] } }
   return data.tracks?.items ?? []
@@ -85,6 +89,7 @@ export async function getAudioFeatures(
   const ids = trackIds.slice(0, 100).join(',')
   const res = await fetch(`https://api.spotify.com/v1/audio-features?ids=${ids}`, {
     headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
   })
 
   if (!res.ok) return new Map()
@@ -191,19 +196,30 @@ function applyArtistDiversity(pool: SpotifyTrackData[]): SpotifyTrackData[] {
       seenArtists.add(primaryArtist)
       diverse.push(track)
     }
-    if (diverse.length >= 5) break
+    if (diverse.length >= 14) break
   }
 
-  if (diverse.length < 5) {
+  if (diverse.length < 14) {
     for (const track of pool) {
       if (!diverse.find((d) => d.id === track.id)) {
         diverse.push(track)
       }
-      if (diverse.length >= 5) break
+      if (diverse.length >= 14) break
     }
   }
 
-  return diverse.slice(0, 5)
+  return diverse.slice(0, 14)
+}
+
+// Genre-based fallback queries when mood-specific searches return too few results
+function buildSpotifyFallback(vibeProfile: VibeProfile): string[] {
+  const genres = vibeProfile.spotifyGenres ?? ['indie', 'sad']
+  const core = vibeProfile.emotionalCore ?? ''
+  return [
+    ...genres.map((g) => `${g} ${core}`.trim()),
+    ...genres.map((g) => `${g} playlist`),
+    `${vibeProfile.moodLabel ?? ''} music`.trim(),
+  ].filter(Boolean).slice(0, 4)
 }
 
 export async function fetchSpotifyTracks(
@@ -212,24 +228,30 @@ export async function fetchSpotifyTracks(
 ): Promise<SpotifyTrackData[]> {
   const token = await getSpotifyToken()
 
-  // Primary: Spotify Recommendations API (acoustically matched, not keyword-matched)
-  const recommendedRaw = await getRecommendations(vibeProfile, token)
-
-  if (recommendedRaw.length >= 5) {
-    const allIds = recommendedRaw.map((t) => t.id)
-    const featuresMap = await getAudioFeatures(allIds, token)
-    const sorted = dedupeAndSort(recommendedRaw, featuresMap, vibeProfile)
-    return applyArtistDiversity(sorted)
-  }
-
-  // Fallback: text search + manual audio filter (for when recommendations API is unavailable)
+  // Collect from all search queries (recommendations API deprecated Nov 2024)
   const rawResults = await Promise.all(queries.map((q) => searchTracks(q, token)))
-  const allRaw = [...recommendedRaw]
+  const seen = new Set<string>()
+  const allRaw: SpotifyRawTrack[] = []
 
   for (const results of rawResults) {
     for (const track of results) {
-      if (!allRaw.find((t) => t.id === track.id)) {
+      if (!seen.has(track.id)) {
+        seen.add(track.id)
         allRaw.push(track)
+      }
+    }
+  }
+
+  // Broaden with fallback queries if we don't have enough candidates
+  if (allRaw.length < 16) {
+    const fallbackQueries = buildSpotifyFallback(vibeProfile)
+    const fallbackResults = await Promise.all(fallbackQueries.map((q) => searchTracks(q, token)))
+    for (const results of fallbackResults) {
+      for (const track of results) {
+        if (!seen.has(track.id)) {
+          seen.add(track.id)
+          allRaw.push(track)
+        }
       }
     }
   }
@@ -238,7 +260,6 @@ export async function fetchSpotifyTracks(
   const featuresMap = await getAudioFeatures(allIds, token)
   const sorted = dedupeAndSort(allRaw, featuresMap, vibeProfile)
   const filtered = filterByVibe(sorted, vibeProfile)
-  const pool = filtered.length >= 3 ? filtered : sorted
-
+  const pool = filtered.length >= 4 ? filtered : sorted
   return applyArtistDiversity(pool)
 }

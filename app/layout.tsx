@@ -5,6 +5,7 @@ import './globals.css'
 import { AudioProvider } from '@/components/shared/AudioContext'
 import { DynamicBackground } from '@/components/shared/DynamicBackground'
 import { ToastProvider } from '@/components/shared/Toast'
+import { NowPlayingBar } from '@/components/shared/NowPlayingBar'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AudioProvider>
             <DynamicBackground />
             {children}
+            <NowPlayingBar />
           </AudioProvider>
         </ToastProvider>
       </body>

@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { RankedTrack, VibeProfile } from '@/types'
 import { TrackCard } from './TrackCard'
 import { TrackCardSkeleton } from '@/components/shared/LoadingSkeleton'
@@ -12,41 +11,87 @@ interface PlaylistColumnProps {
   vibeProfile: VibeProfile
   isLoading?: boolean
   isUnderground?: boolean
+  showHeader?: boolean
+  onOpenTrack: (track: RankedTrack) => void
 }
 
-export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading, isUnderground }: PlaylistColumnProps) {
-  const [expandedCardId, setExpandedCardId] = useState<string | null>(null)
-
-  function handleExpand(trackId: string) {
-    setExpandedCardId((prev) => (prev === trackId ? null : trackId))
-  }
-
+export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading, isUnderground, showHeader = true, onOpenTrack }: PlaylistColumnProps) {
   const vibeKeywords = vibeProfile.sonicTexture
   const moodLabel = vibeProfile.moodLabel
 
   return (
     <div className="flex flex-col gap-3">
       {/* Column header */}
-      <div className="mb-1">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: dotColor }} />
-          <h2
-            className={`text-[0.7rem] font-mono font-bold uppercase tracking-[0.15em] ${isUnderground ? 'italic' : ''}`}
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            {title}
-          </h2>
+      {showHeader && (
+        <div className="mb-1">
+          <div className="flex items-center gap-2">
+            {/* Thin vertical bar */}
+            <div
+              style={{
+                width: '2px',
+                height: '18px',
+                background: dotColor,
+                borderRadius: '1px',
+                flexShrink: 0,
+              }}
+            />
+            <div>
+              <div className="flex items-center gap-1.5">
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-geist-mono)',
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-muted)',
+                    fontWeight: 400,
+                  }}
+                >
+                  {title}
+                </h2>
+                {tracks.length > 0 && (
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-geist-mono)',
+                      fontSize: '0.62rem',
+                      letterSpacing: '0.1em',
+                      color: 'var(--text-muted)',
+                      opacity: 0.6,
+                    }}
+                  >
+                    ({tracks.length} tracks)
+                  </span>
+                )}
+              </div>
+              {isUnderground && (
+                <p
+                  style={{
+                    fontFamily: 'var(--font-geist-mono)',
+                    fontSize: '0.58rem',
+                    letterSpacing: '0.1em',
+                    color: 'var(--text-muted)',
+                    opacity: 0.55,
+                    marginTop: '0.15rem',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Independent · Audius
+                </p>
+              )}
+            </div>
+          </div>
         </div>
-        {isUnderground && (
-          <p className="text-[0.62rem] font-mono mt-0.5 ml-4" style={{ color: 'var(--text-muted)' }}>
-            Independent artists · Audius
-          </p>
-        )}
-      </div>
+      )}
 
-      <div className="flex flex-col gap-3">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '0.75rem',
+        }}
+      >
         {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => <TrackCardSkeleton key={i} />)
+          Array.from({ length: 6 }).map((_, i) => <TrackCardSkeleton key={i} />)
         ) : tracks.length === 0 ? (
           <div
             className="rounded-2xl p-6 text-center"
@@ -71,8 +116,7 @@ export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading
               index={i}
               vibeKeywords={vibeKeywords}
               moodLabel={moodLabel}
-              isExpanded={expandedCardId === track.track.id}
-              onExpand={() => handleExpand(track.track.id)}
+              onOpen={() => onOpenTrack(track)}
             />
           ))
         )}

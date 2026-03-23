@@ -22,43 +22,97 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
     router.push(`/moments/${id}`)
   }
 
+  const keywords = vibeProfile.sonicTexture?.slice(0, 3) ?? []
+  const extraCount = (vibeProfile.sonicTexture?.length ?? 0) - 3
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
-      className="group relative rounded-2xl overflow-hidden border cursor-pointer transition-transform duration-200 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-cyan-400"
-      style={{ borderColor: 'rgba(255,255,255,0.07)' }}
+      className="group"
+      style={{
+        position: 'relative',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        background: 'var(--depth-2)',
+        border: '1px solid var(--glass-border)',
+        cursor: 'pointer',
+        transition: 'transform 0.2s, border-color 0.2s, box-shadow 0.2s',
+      }}
       onClick={handleClick}
       role="button"
       tabIndex={0}
       aria-label={`View ${moodLabel} playlist`}
       onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+      whileHover={{
+        y: -2,
+        transition: { duration: 0.2 },
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLDivElement
+        el.style.borderColor = 'var(--glass-border-bright)'
+        el.style.boxShadow = '0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px var(--glass-border-bright)'
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLDivElement
+        el.style.borderColor = 'var(--glass-border)'
+        el.style.boxShadow = 'none'
+      }}
     >
-      {/* Color gradient strip */}
+      {/* Left vertical gradient strip */}
       <div
-        className="h-1.5 w-full"
         style={{
-          background: `linear-gradient(90deg, ${colorPalette.primary}, ${colorPalette.secondary})`,
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '4px',
+          background: `linear-gradient(180deg, ${colorPalette.primary}, ${colorPalette.secondary})`,
         }}
       />
 
-      <div className="p-4" style={{ background: 'var(--muse-surface)' }}>
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm mb-1 truncate" style={{ color: colorPalette.primary }}>
+      {/* Content area — extra left padding to clear the strip */}
+      <div style={{ padding: '1rem 1rem 1rem 1.25rem' }}>
+        {/* Top row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
+          {/* Left side */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-syne)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                color: colorPalette.primary,
+                marginBottom: '0.35rem',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
               {moodLabel}
             </p>
             <p
-              className="text-[0.78rem] leading-relaxed line-clamp-2 italic"
-              style={{ color: 'var(--text-secondary)' }}
+              style={{
+                fontSize: '0.78rem',
+                fontStyle: 'italic',
+                lineHeight: 1.55,
+                color: 'var(--text-secondary)',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
             >
               &ldquo;{originalInput}&rdquo;
             </p>
           </div>
 
-          {/* Actions — show on hover */}
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          {/* Actions — show on group-hover */}
+          <div
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}
+          >
             <button
               onClick={(e) => {
                 e.stopPropagation()
@@ -84,13 +138,75 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-3">
-          <span className="text-[0.65rem] font-mono" style={{ color: 'var(--text-muted)' }}>
-            {tracks.length} track{tracks.length !== 1 ? 's' : ''}
-          </span>
-          <span className="text-[0.65rem] font-mono" style={{ color: 'var(--text-muted)' }}>
-            {timeAgo(createdAt)}
-          </span>
+        {/* Bottom row */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: '0.75rem',
+          }}
+        >
+          {/* Keyword pills */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexWrap: 'wrap' }}>
+            {keywords.map((kw) => (
+              <span
+                key={kw}
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.5)',
+                  fontSize: '0.6rem',
+                  fontFamily: 'var(--font-geist-mono)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '3px',
+                }}
+              >
+                {kw}
+              </span>
+            ))}
+            {extraCount > 0 && (
+              <span
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.5)',
+                  fontSize: '0.6rem',
+                  fontFamily: 'var(--font-geist-mono)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '3px',
+                }}
+              >
+                +{extraCount}
+              </span>
+            )}
+          </div>
+
+          {/* Track count + timestamp */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-geist-mono)',
+                fontSize: '0.62rem',
+                color: 'var(--text-muted)',
+              }}
+            >
+              {tracks.length} track{tracks.length !== 1 ? 's' : ''}
+            </span>
+            <span
+              style={{
+                fontFamily: 'var(--font-geist-mono)',
+                fontSize: '0.62rem',
+                color: 'var(--text-muted)',
+              }}
+            >
+              {timeAgo(createdAt)}
+            </span>
+          </div>
         </div>
       </div>
     </motion.div>

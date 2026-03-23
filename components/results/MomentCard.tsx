@@ -48,41 +48,104 @@ export function MomentCard({ originalInput, vibeProfile, onSave, isSaved }: Mome
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4 }}
-      className="relative rounded-2xl p-6 border"
       style={{
-        background: 'var(--muse-surface)',
-        borderColor: 'rgba(255,255,255,0.07)',
+        position: 'relative',
+        padding: '2rem 0',
+        paddingBottom: '1rem',
       }}
     >
+      {/* Large decorative opening quote */}
+      <span
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '-0.5rem',
+          fontSize: '7rem',
+          fontFamily: 'Georgia, serif',
+          color: 'rgba(var(--muse-primary-rgb), 0.18)',
+          lineHeight: 1,
+          userSelect: 'none',
+          pointerEvents: 'none',
+        }}
+      >
+        &ldquo;
+      </span>
+
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-8">
-        {/* Left: vibe name (hero) + quote (secondary) + keywords */}
+        {/* Left: date + moodLabel (hero) + rule + quote + mono label + keywords */}
         <div className="flex-1">
-          {/* Date/time */}
-          <p className="text-[0.65rem] font-mono mb-3" style={{ color: 'var(--text-muted)' }}>
+          {/* Date/time — moved above moodLabel */}
+          <p
+            style={{
+              fontFamily: 'var(--font-geist-mono)',
+              fontSize: '0.62rem',
+              color: 'var(--text-muted)',
+              marginBottom: '0.5rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+            }}
+          >
             {formatDateTime(Date.now())}
           </p>
 
-          {/* Vibe name — the hero */}
+          {/* moodLabel — hero */}
           <p
-            className="text-3xl font-extrabold mb-2 leading-tight"
             style={{
-              background: `linear-gradient(135deg, var(--muse-primary), var(--muse-secondary))`,
+              fontFamily: 'var(--font-syne)',
+              fontSize: 'clamp(1.8rem, 4vw, 3rem)',
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, var(--muse-primary), var(--muse-secondary))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              fontFamily: 'var(--font-syne)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              marginBottom: '0.75rem',
             }}
           >
             {moodLabel}
           </p>
 
-          {/* Original input — secondary */}
+          {/* Thin horizontal rule */}
+          <div
+            style={{
+              height: '1px',
+              background: 'linear-gradient(90deg, var(--muse-primary), transparent)',
+              width: '100%',
+              marginBottom: '1.25rem',
+              opacity: 0.3,
+            }}
+          />
+
+          {/* Original input quote */}
           <blockquote
-            className="text-[0.9rem] leading-relaxed mb-4 italic"
-            style={{ color: 'rgba(148,163,184,0.8)' }}
+            style={{
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
+              fontStyle: 'italic',
+              fontWeight: 300,
+              fontFamily: 'var(--font-geist-sans)',
+              color: 'rgba(255,255,255,0.75)',
+              lineHeight: 1.5,
+              margin: '0 0 0.75rem',
+            }}
           >
             &ldquo;{originalInput}&rdquo;
           </blockquote>
+
+          {/* moodLabel in mono small caps */}
+          <p
+            style={{
+              fontFamily: 'var(--font-geist-mono)',
+              fontSize: '0.68rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.15em',
+              color: 'var(--muse-primary)',
+              marginBottom: '1rem',
+            }}
+          >
+            {moodLabel}
+          </p>
 
           <MoodKeywords keywords={keywords} />
         </div>
@@ -130,7 +193,15 @@ export function MomentCard({ originalInput, vibeProfile, onSave, isSaved }: Mome
                 How intense and driving this vibe is
               </div>
             </div>
-            <span className="text-[0.6rem] font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-geist-mono)',
+                fontSize: '0.6rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: 'var(--text-muted)',
+              }}
+            >
               Energy
             </span>
           </div>
@@ -150,7 +221,15 @@ export function MomentCard({ originalInput, vibeProfile, onSave, isSaved }: Mome
             >
               <Share2 className="w-4 h-4" style={{ color: 'var(--muse-secondary)' }} />
             </div>
-            <span className="text-[0.6rem] font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-geist-mono)',
+                fontSize: '0.6rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: 'var(--text-muted)',
+              }}
+            >
               Share
             </span>
           </button>
@@ -173,7 +252,15 @@ export function MomentCard({ originalInput, vibeProfile, onSave, isSaved }: Mome
             >
               <Bookmark className="w-4 h-4" fill={isSaved ? 'white' : 'none'} color={isSaved ? 'white' : 'var(--muse-primary)'} />
             </div>
-            <span className="text-[0.6rem] font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-geist-mono)',
+                fontSize: '0.6rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                color: 'var(--text-muted)',
+              }}
+            >
               {isSaved ? 'Saved' : 'Save'}
             </span>
           </button>

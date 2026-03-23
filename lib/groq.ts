@@ -74,14 +74,18 @@ Return ONLY a valid JSON object matching this exact structure. No markdown, no b
   "era": "timeless|70s|80s|90s|2000s|modern",
   "searchQueries": {
     "mainstream": [
-      "query for established artists matching this feeling",
+      "artist or song name matching this feeling",
       "query 2",
-      "query 3"
+      "query 3",
+      "query 4",
+      "query 5"
     ],
     "underground": [
       "genre + mood query for Audius (e.g. 'lo-fi melancholy piano')",
       "genre + emotion query 2 (e.g. 'indie sad bedroom pop')",
-      "genre + texture query 3 (e.g. 'ambient introspective guitar')"
+      "genre + texture query 3 (e.g. 'ambient introspective guitar')",
+      "genre + instrument query 4",
+      "broader genre query 5 (e.g. just 'lo-fi chill' or 'indie folk')"
     ]
   },
   "colorPalette": {

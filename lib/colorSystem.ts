@@ -31,12 +31,23 @@ export function applyColorPalette(palette: ColorPalette): void {
   const root = document.documentElement
   root.style.setProperty('--muse-primary', palette.primary)
   root.style.setProperty('--muse-secondary', palette.secondary)
-  root.style.setProperty('--muse-bg', palette.background)
   root.style.setProperty('--muse-text', palette.text)
   root.style.setProperty('--muse-surface', palette.surface)
+
   const primaryRgb = hexToRgb(palette.primary)
   if (primaryRgb) {
-    root.style.setProperty('--muse-primary-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`)
+    const { r, g, b } = primaryRgb
+    root.style.setProperty('--muse-primary-rgb', `${r}, ${g}, ${b}`)
+    const bg = `rgb(${Math.round(r * 0.06)}, ${Math.round(g * 0.06)}, ${Math.round(b * 0.10 + 4)})`
+    root.style.setProperty('--muse-bg', bg)
+  } else {
+    root.style.setProperty('--muse-bg', palette.background)
+  }
+
+  const secondaryRgb = hexToRgb(palette.secondary)
+  if (secondaryRgb) {
+    const { r, g, b } = secondaryRgb
+    root.style.setProperty('--muse-secondary-rgb', `${r}, ${g}, ${b}`)
   }
 }
 
