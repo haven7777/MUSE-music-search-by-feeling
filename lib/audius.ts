@@ -84,8 +84,8 @@ export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[
     }
   }
 
-  // If specific queries returned nothing, try broader fallback queries
-  if (all.length === 0) {
+  // If we have fewer than 8 tracks, broaden with fallback queries
+  if (all.length < 8) {
     const fallbackQueries = buildFallbackQueries(queries)
     const fallbackResults = await Promise.all(
       fallbackQueries.map((q) => searchAudiusTracks(q, 15)),
@@ -100,7 +100,7 @@ export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[
     }
   }
 
-  // Artist diversity: max 1 track per artist
+  // Artist diversity: max 1 track per artist (first pass)
   const seenArtists = new Set<string>()
   const diverse: AudiusTrack[] = []
   all.sort((a, b) => b.playCount - a.playCount)
@@ -111,6 +111,16 @@ export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[
       diverse.push(track)
     }
     if (diverse.length >= 8) break
+  }
+
+  // Fill remaining slots allowing repeat artists if needed
+  if (diverse.length < 8) {
+    for (const track of all) {
+      if (!diverse.find((d) => d.id === track.id)) {
+        diverse.push(track)
+      }
+      if (diverse.length >= 8) break
+    }
   }
 
   return diverse
