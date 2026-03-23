@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { findPreview } from '@/lib/itunes'
+import { findPreview } from '@/lib/deezer'
 
 interface TrackInput {
   id: string

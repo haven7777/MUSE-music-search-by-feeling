@@ -196,19 +196,19 @@ function applyArtistDiversity(pool: SpotifyTrackData[]): SpotifyTrackData[] {
       seenArtists.add(primaryArtist)
       diverse.push(track)
     }
-    if (diverse.length >= 8) break
+    if (diverse.length >= 14) break
   }
 
-  if (diverse.length < 8) {
+  if (diverse.length < 14) {
     for (const track of pool) {
       if (!diverse.find((d) => d.id === track.id)) {
         diverse.push(track)
       }
-      if (diverse.length >= 8) break
+      if (diverse.length >= 14) break
     }
   }
 
-  return diverse.slice(0, 8)
+  return diverse.slice(0, 14)
 }
 
 // Genre-based fallback queries when mood-specific searches return too few results

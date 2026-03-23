@@ -94,10 +94,10 @@ function HomePageInner() {
         previewMap = data.previews
       }
 
-      const spotifyWithPreviews = spotify.map((t) => ({
-        ...t,
-        itunesPreviewUrl: previewMap[t.id] ?? null,
-      }))
+      const spotifyWithPreviews = spotify
+        .map((t) => ({ ...t, itunesPreviewUrl: previewMap[t.id] ?? null }))
+        .sort((a, b) => (b.itunesPreviewUrl ? 1 : 0) - (a.itunesPreviewUrl ? 1 : 0))
+        .slice(0, 8)
 
       // Step 4: Rank all tracks
       const allTracks = [
