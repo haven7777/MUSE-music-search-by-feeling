@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Send } from 'lucide-react'
-import { motion, useAnimation } from 'framer-motion'
+import { Send, Mic, MicOff } from 'lucide-react'
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { TypewriterPlaceholder } from './TypewriterPlaceholder'
+import { ListeningPill } from './ListeningPill'
+import { useVoiceInput } from '@/hooks/useVoiceInput'
 
 interface HeroInputProps {
   onSubmit: (value: string) => void
@@ -15,9 +17,30 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
   const [focused, setFocused] = useState(false)
   const [showHint, setShowHint] = useState(false)
   const [showValidationMsg, setShowValidationMsg] = useState(false)
+  const [micError, setMicError] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const micErrorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const controls = useAnimation()
+
+  const { start: startVoice, stop: stopVoice, isListening, isSupported: isVoiceSupported } = useVoiceInput({
+    onTranscript: (text) => {
+      setValue(text)
+      // Auto-resize textarea
+      const el = textareaRef.current
+      if (el) {
+        el.style.height = 'auto'
+        el.style.height = `${el.scrollHeight}px`
+      }
+    },
+    onError: (err) => {
+      if (err === 'permission-denied') {
+        if (micErrorTimerRef.current) clearTimeout(micErrorTimerRef.current)
+        setMicError('Microphone access needed for voice input')
+        micErrorTimerRef.current = setTimeout(() => setMicError(''), 4000)
+      }
+    },
+  })
 
   // Show "Press Enter" hint after 1.5s of no typing activity
   useEffect(() => {
@@ -91,6 +114,9 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
         }}
       >
         <div className="relative">
+          <AnimatePresence>
+            {isListening && <ListeningPill onStop={stopVoice} />}
+          </AnimatePresence>
           {!value && !focused && (
             <div className="absolute inset-0 pointer-events-none" style={{ padding: '1.25rem 1.5rem', fontSize: '1rem', lineHeight: '1.7' }}>
               <TypewriterPlaceholder visible={!value && !focused} />
@@ -168,24 +194,67 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
             )}
           </div>
 
-          {/* Icon-only submit for mobile */}
-          <button
-            type="submit"
-            disabled={!canSubmit}
-            aria-hidden="true"
-            tabIndex={-1}
-            aria-label="Find my soundtrack"
-            className="flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-105 active:scale-95 sm:hidden"
-            style={{
-              background: canSubmit ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
-              color: canSubmit ? 'white' : 'rgba(255,255,255,0.3)',
-              opacity: canSubmit ? 1 : 0.5,
-            }}
-          >
-            <Send className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Mic button */}
+            <button
+              type="button"
+              onClick={isListening ? stopVoice : startVoice}
+              aria-label={isListening ? 'Stop listening' : 'Speak your feeling'}
+              title={!isVoiceSupported ? 'Voice not supported in this browser' : undefined}
+              className="flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-105 active:scale-95"
+              style={{
+                background: isListening
+                  ? 'rgba(var(--muse-primary-rgb, 139,92,246), 0.2)'
+                  : 'rgba(255,255,255,0.06)',
+                color: isListening ? 'var(--muse-primary, #8b5cf6)' : 'rgba(255,255,255,0.5)',
+                border: isListening
+                  ? '1px solid rgba(var(--muse-primary-rgb, 139,92,246), 0.4)'
+                  : '1px solid transparent',
+                cursor: !isVoiceSupported ? 'default' : 'pointer',
+              }}
+            >
+              {isVoiceSupported ? (
+                <Mic className="w-3.5 h-3.5" />
+              ) : (
+                <MicOff className="w-3.5 h-3.5" />
+              )}
+            </button>
+
+            {/* Icon-only submit for mobile */}
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              aria-hidden="true"
+              tabIndex={-1}
+              aria-label="Find my soundtrack"
+              className="flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-105 active:scale-95 sm:hidden"
+              style={{
+                background: canSubmit ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
+                color: canSubmit ? 'white' : 'rgba(255,255,255,0.3)',
+                opacity: canSubmit ? 1 : 0.5,
+              }}
+            >
+              <Send className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </motion.div>
+
+      {/* Mic permission error */}
+      <AnimatePresence>
+        {micError && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-center text-[0.75rem] mt-2"
+            style={{ color: '#f87171' }}
+          >
+            {micError}
+          </motion.p>
+        )}
+      </AnimatePresence>
 
       {/* Pill submit button — always visible below the textarea */}
       <div className="flex justify-center" style={{ marginTop: '1rem' }}>
