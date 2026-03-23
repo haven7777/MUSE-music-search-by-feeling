@@ -164,7 +164,7 @@
 html,
 body {
   height: 100%;
-  background: var(--muse-bg, var(--depth-1));
+  background: transparent;
   color: var(--muse-text, var(--text-primary));
 }
 
