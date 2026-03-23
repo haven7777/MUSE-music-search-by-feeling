@@ -36,13 +36,11 @@ interface UseVoiceInputReturn {
 
 export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions): UseVoiceInputReturn {
   const [isListening, setIsListening] = useState(false)
+  const [isSupported, setIsSupported] = useState(false)
   const recognitionRef = useRef<ISpeechRecognition | null>(null)
 
-  const isSupported =
-    typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
-
   useEffect(() => {
+    setIsSupported('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
     return () => {
       recognitionRef.current?.stop()
     }
