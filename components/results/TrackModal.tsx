@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { X, Heart, ExternalLink, Sparkles, Music } from 'lucide-react'
 import { RankedTrack, SpotifyTrackData, AudiusTrack, VibeProfile } from '@/types'
 import { isFavoriteTrack, addFavoriteTrack, removeFavoriteTrack } from '@/lib/storage'
