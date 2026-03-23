@@ -14,14 +14,14 @@ export default function MomentsPage() {
         <div className="flex flex-col items-center text-center mb-10 gap-4">
           <Link
             href="/"
-            className="text-[0.75rem] font-mono uppercase tracking-widest transition-all hover:opacity-100 inline-flex items-center gap-1"
+            className="text-[0.88rem] font-mono uppercase tracking-widest transition-all hover:opacity-100 inline-flex items-center gap-1"
             style={{
-              color: 'rgba(255,255,255,0.75)',
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              padding: '0.3rem 0.75rem',
+              color: 'rgba(255,255,255,0.9)',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              padding: '0.5rem 1.1rem',
               borderRadius: '50px',
-              fontWeight: 600,
+              fontWeight: 700,
             }}
           >
             ← Back to MUSE
