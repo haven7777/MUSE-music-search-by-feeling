@@ -93,7 +93,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
               <p
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.72rem',
+                  fontSize: '0.88rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.15em',
                   color: 'rgba(255,255,255,0.55)',
@@ -213,11 +213,11 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                 transition={{ delay: 0.2 + i * 0.06, duration: 0.25 }}
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.72rem',
+                  fontSize: '0.85rem',
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  padding: '0.25rem 0.65rem',
+                  padding: '0.3rem 0.8rem',
                   borderRadius: '50px',
                   background: 'rgba(255,255,255,0.12)',
                   border: '1px solid rgba(255,255,255,0.25)',
