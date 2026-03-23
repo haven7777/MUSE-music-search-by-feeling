@@ -8,7 +8,6 @@ import { applyColorPalette } from '@/lib/colorSystem'
 import { savePlaylist, generateId } from '@/lib/storage'
 import { useToast } from '@/components/shared/Toast'
 import { PlaylistColumn } from './PlaylistColumn'
-import { VibeSignature } from './VibeSignature'
 import { TrackModal } from './TrackModal'
 
 interface ResultsPageProps {
@@ -19,10 +18,9 @@ type Tab = 'mainstream' | 'underground'
 
 export function ResultsPage({ playlist }: ResultsPageProps) {
   const { originalInput, vibeProfile, tracks } = playlist
-  const { moodLabel, emotionalCore, sonicTexture, energyLevel, colorPalette } = vibeProfile
+  const { moodLabel, emotionalCore, sonicTexture, colorPalette } = vibeProfile
   const [isSaved, setIsSaved] = useState(false)
   const [activeTab, setActiveTab] = useState<Tab>('mainstream')
-  const [showSignature, setShowSignature] = useState(false)
   const [selectedTrack, setSelectedTrack] = useState<RankedTrack | null>(null)
   const { showToast } = useToast()
 
@@ -56,21 +54,10 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
   const spotifyDeduped = deduped(tracks.filter((t) => t.source === 'spotify'))
   const audiusDeduped = deduped(tracks.filter((t) => t.source === 'audius'))
 
-  const spotifyWithFeatures = spotifyDeduped.find(
-    (t) => t.source === 'spotify' && 'audioFeatures' in t.track && t.track.audioFeatures,
-  )
-  const features =
-    spotifyWithFeatures && 'audioFeatures' in spotifyWithFeatures.track
-      ? (spotifyWithFeatures.track.audioFeatures ?? {})
-      : {}
-
   const keywords = [emotionalCore, ...sonicTexture]
     .slice(0, 5)
     .map((k) => k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
     .filter(Boolean)
-
-  const circumference = 2 * Math.PI * 14
-  const energyDash = (energyLevel / 100) * circumference
 
   return (
     <>
@@ -181,73 +168,30 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
             </div>
           </div>
 
-          {/* Keyword pills + energy row */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '0.75rem',
-              marginTop: '1rem',
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-              {keywords.map((kw, i) => (
-                <motion.span
-                  key={kw}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + i * 0.06, duration: 0.25 }}
-                  style={{
-                    fontFamily: 'var(--font-geist-mono)',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '50px',
-                    background: 'rgba(var(--muse-primary-rgb), 0.1)',
-                    border: '1px solid rgba(var(--muse-primary-rgb), 0.22)',
-                    color: 'var(--muse-primary)',
-                  }}
-                >
-                  {kw}
-                </motion.span>
-              ))}
-            </div>
-
-            {/* Compact energy indicator */}
-            <div
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}
-              title={`Energy: ${energyLevel}%`}
-            >
-              <svg width="32" height="32" viewBox="0 0 32 32" aria-label={`Energy ${energyLevel}%`}>
-                <circle cx="16" cy="16" r="14" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2.5" />
-                <circle
-                  cx="16" cy="16" r="14" fill="none"
-                  stroke="var(--muse-primary)" strokeWidth="2.5"
-                  strokeDasharray={`${energyDash} ${circumference}`}
-                  strokeLinecap="round"
-                  transform="rotate(-90 16 16)"
-                  strokeOpacity={0.9}
-                />
-                <text x="16" y="20" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.6)" fontFamily="monospace" fontWeight="bold">
-                  {energyLevel}
-                </text>
-              </svg>
-              <span
+          {/* Keyword pills */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '1rem' }}>
+            {keywords.map((kw, i) => (
+              <motion.span
+                key={kw}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.06, duration: 0.25 }}
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.68rem',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  color: 'var(--text-muted)',
+                  letterSpacing: '0.05em',
+                  padding: '0.25rem 0.65rem',
+                  borderRadius: '50px',
+                  background: 'rgba(var(--muse-primary-rgb), 0.1)',
+                  border: '1px solid rgba(var(--muse-primary-rgb), 0.22)',
+                  color: 'var(--muse-primary)',
                 }}
               >
-                Energy
-              </span>
-            </div>
+                {kw}
+              </motion.span>
+            ))}
           </div>
         </motion.section>
 
@@ -357,60 +301,6 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
           </motion.div>
         </AnimatePresence>
 
-        {/* ── Vibe signature — collapsible ─────────────────────── */}
-        <div style={{ marginTop: '3rem', paddingBottom: '2rem' }}>
-          <button
-            onClick={() => setShowSignature((v) => !v)}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              padding: '0.6rem 0',
-              background: 'none',
-              border: '1px solid var(--glass-border)',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              color: 'var(--text-muted)',
-              fontFamily: 'var(--font-geist-mono)',
-              fontSize: '0.62rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.12em',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--glass-border-bright)'
-              e.currentTarget.style.color = 'var(--muse-text)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--glass-border)'
-              e.currentTarget.style.color = 'var(--text-muted)'
-            }}
-          >
-            {showSignature ? '↑ Hide Vibe Signature' : '✦ View Vibe Signature'}
-          </button>
-
-          <AnimatePresence>
-            {showSignature && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                style={{ overflow: 'hidden' }}
-              >
-                <div style={{ paddingTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-                  <VibeSignature
-                    features={features}
-                    energyLevel={energyLevel}
-                    moodLabel={moodLabel}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
 
       </div>
     </div>
