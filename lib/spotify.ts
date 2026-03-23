@@ -28,8 +28,12 @@ interface SpotifyRawFeatures {
 }
 
 export async function searchTracks(query: string, token: string): Promise<SpotifyRawTrack[]> {
-  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=15`
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+  const params = new URLSearchParams({ q: query, type: 'track', limit: '10' })
+  const url = `https://api.spotify.com/v1/search?${params.toString()}`
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  })
   if (!res.ok) return []
   const data = (await res.json()) as { tracks: { items: SpotifyRawTrack[] } }
   return data.tracks?.items ?? []
@@ -85,6 +89,7 @@ export async function getAudioFeatures(
   const ids = trackIds.slice(0, 100).join(',')
   const res = await fetch(`https://api.spotify.com/v1/audio-features?ids=${ids}`, {
     headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
   })
 
   if (!res.ok) return new Map()
@@ -256,6 +261,5 @@ export async function fetchSpotifyTracks(
   const sorted = dedupeAndSort(allRaw, featuresMap, vibeProfile)
   const filtered = filterByVibe(sorted, vibeProfile)
   const pool = filtered.length >= 4 ? filtered : sorted
-
   return applyArtistDiversity(pool)
 }
