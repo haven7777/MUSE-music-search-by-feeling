@@ -31,12 +31,19 @@ export function applyColorPalette(palette: ColorPalette): void {
   const root = document.documentElement
   root.style.setProperty('--muse-primary', palette.primary)
   root.style.setProperty('--muse-secondary', palette.secondary)
-  root.style.setProperty('--muse-bg', palette.background)
   root.style.setProperty('--muse-text', palette.text)
   root.style.setProperty('--muse-surface', palette.surface)
+
+  // Blend the mood primary color into the page background
   const primaryRgb = hexToRgb(palette.primary)
   if (primaryRgb) {
     root.style.setProperty('--muse-primary-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`)
+    // Build a tinted dark background using the primary color
+    const { r, g, b } = primaryRgb
+    const bg = `rgb(${Math.round(r * 0.07)}, ${Math.round(g * 0.07)}, ${Math.round(b * 0.12 + 6)})`
+    root.style.setProperty('--muse-bg', bg)
+  } else {
+    root.style.setProperty('--muse-bg', palette.background)
   }
 }
 
