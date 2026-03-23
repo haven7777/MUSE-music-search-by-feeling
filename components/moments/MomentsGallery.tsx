@@ -104,12 +104,13 @@ export function MomentsGallery() {
                 className="flex items-center gap-1.5 transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full"
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.8rem',
+                  fontSize: '0.88rem',
                   fontWeight: 600,
                   color: '#fca5a5',
                   background: 'rgba(239,68,68,0.12)',
                   border: '1px solid rgba(239,68,68,0.35)',
-                  padding: '0.35rem 0.85rem',
+                  padding: '0.5rem 1rem',
+                  marginTop: '0.5rem',
                 }}
               >
                 <Trash2 className="w-3.5 h-3.5" />
