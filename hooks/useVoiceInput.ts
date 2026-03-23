@@ -37,22 +37,39 @@ interface UseVoiceInputReturn {
 export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions): UseVoiceInputReturn {
   const [isListening, setIsListening] = useState(false)
   const [isSupported, setIsSupported] = useState(false)
+
   const recognitionRef = useRef<ISpeechRecognition | null>(null)
   const stoppedByUserRef = useRef(false)
-  const SpeechRecognitionAPIRef = useRef<SpeechRecognitionConstructor | null>(null)
+  const restartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Keep callbacks in refs so closures never go stale
+  const onTranscriptRef = useRef(onTranscript)
+  const onErrorRef = useRef(onError)
+  useEffect(() => { onTranscriptRef.current = onTranscript }, [onTranscript])
+  useEffect(() => { onErrorRef.current = onError }, [onError])
 
   useEffect(() => {
     setIsSupported('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
     return () => {
+      stoppedByUserRef.current = true
+      if (restartTimerRef.current) clearTimeout(restartTimerRef.current)
       recognitionRef.current?.stop()
     }
   }, [])
 
-  function createAndStart() {
-    const SpeechRecognitionAPI = SpeechRecognitionAPIRef.current
-    if (!SpeechRecognitionAPI) return
+  function getAPI(): SpeechRecognitionConstructor | null {
+    const w = window as typeof window & {
+      SpeechRecognition?: SpeechRecognitionConstructor
+      webkitSpeechRecognition?: SpeechRecognitionConstructor
+    }
+    return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
+  }
 
-    const recognition = new SpeechRecognitionAPI()
+  function createAndStart() {
+    const API = getAPI()
+    if (!API) return
+
+    const recognition = new API()
     recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = 'en-US'
@@ -64,18 +81,7 @@ export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions): 
       for (let i = 0; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript
       }
-      onTranscript(transcript)
-    }
-
-    recognition.onend = () => {
-      // Some browsers end recognition after silence even with continuous: true
-      // Auto-restart unless the user explicitly stopped
-      if (!stoppedByUserRef.current) {
-        createAndStart()
-      } else {
-        setIsListening(false)
-        recognitionRef.current = null
-      }
+      onTranscriptRef.current(transcript)
     }
 
     recognition.onerror = (event) => {
@@ -83,35 +89,47 @@ export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions): 
         stoppedByUserRef.current = true
         setIsListening(false)
         recognitionRef.current = null
-        onError?.('permission-denied')
+        onErrorRef.current?.('permission-denied')
       }
-      // 'no-speech' and others: let onend handle restart
+      // aborted / no-speech: let onend handle it
+    }
+
+    recognition.onend = () => {
+      recognitionRef.current = null
+      if (stoppedByUserRef.current) {
+        setIsListening(false)
+        return
+      }
+      // Browser cut the session (common in Chrome) — restart after brief delay
+      restartTimerRef.current = setTimeout(() => {
+        if (!stoppedByUserRef.current) createAndStart()
+      }, 150)
     }
 
     recognitionRef.current = recognition
-    recognition.start()
+    try {
+      recognition.start()
+    } catch {
+      // start() can throw if called too soon after stop — retry once
+      restartTimerRef.current = setTimeout(() => {
+        if (!stoppedByUserRef.current) createAndStart()
+      }, 300)
+    }
   }
 
   function start() {
     if (!isSupported) {
-      onError?.('not-supported')
+      onErrorRef.current?.('not-supported')
       return
     }
-
-    const w = window as typeof window & {
-      SpeechRecognition?: SpeechRecognitionConstructor
-      webkitSpeechRecognition?: SpeechRecognitionConstructor
-    }
-    const SpeechRecognitionAPI = w.SpeechRecognition ?? w.webkitSpeechRecognition
-    if (!SpeechRecognitionAPI) return
-
-    SpeechRecognitionAPIRef.current = SpeechRecognitionAPI
+    if (restartTimerRef.current) clearTimeout(restartTimerRef.current)
     stoppedByUserRef.current = false
     createAndStart()
   }
 
   function stop() {
     stoppedByUserRef.current = true
+    if (restartTimerRef.current) clearTimeout(restartTimerRef.current)
     recognitionRef.current?.stop()
   }
 
