@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { AudioController } from '@/lib/audioSync'
 
 interface AudioState {
@@ -47,6 +48,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       controller.destroy()
     }
   }, [])
+
+  // Pause when navigating to a different page
+  const pathname = usePathname()
+  useEffect(() => {
+    controllerRef.current?.pause()
+  }, [pathname])
 
   const play = useCallback((trackId: string, src: string) => {
     controllerRef.current?.play(trackId, src)

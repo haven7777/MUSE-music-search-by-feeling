@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
-import { motion, useAnimation, AnimatePresence } from 'framer-motion'
+import { motion, useAnimation } from 'framer-motion'
 import { TypewriterPlaceholder } from './TypewriterPlaceholder'
 
 interface HeroInputProps {
@@ -168,17 +168,18 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
             )}
           </div>
 
-          {/* Icon-only submit for mobile / secondary form submit */}
+          {/* Icon-only submit for mobile */}
           <button
             type="submit"
             disabled={!canSubmit}
             aria-hidden="true"
             tabIndex={-1}
             aria-label="Find my soundtrack"
-            className="flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-105 active:scale-95 disabled:opacity-0 sm:hidden"
+            className="flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-105 active:scale-95 sm:hidden"
             style={{
-              background: canSubmit ? 'var(--muse-primary)' : 'transparent',
-              color: 'white',
+              background: canSubmit ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
+              color: canSubmit ? 'white' : 'rgba(255,255,255,0.3)',
+              opacity: canSubmit ? 1 : 0.5,
             }}
           >
             <Send className="w-3.5 h-3.5" />
@@ -186,52 +187,43 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
         </div>
       </motion.div>
 
-      {/* Pill submit button — centered below the textarea, fades in when canSubmit */}
-      <AnimatePresence>
-        {canSubmit && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-            className="flex justify-center"
-            style={{ marginTop: '1rem' }}
-          >
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className="transition-all focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-              style={{
-                background: 'var(--muse-primary)',
-                borderRadius: '50px',
-                padding: '0.65rem 1.75rem',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-                letterSpacing: '0.02em',
-                color: 'white',
-                boxShadow: '0 4px 24px var(--glow-primary-soft)',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-              onMouseEnter={(e) => {
-                ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
-                ;(e.currentTarget as HTMLButtonElement).style.boxShadow =
-                  '0 8px 32px var(--glow-primary-soft)'
-              }}
-              onMouseLeave={(e) => {
-                ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
-                ;(e.currentTarget as HTMLButtonElement).style.boxShadow =
-                  '0 4px 24px var(--glow-primary-soft)'
-              }}
-              onMouseDown={(e) => {
-                ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
-              }}
-            >
-              {isLoading ? 'Finding…' : 'Feel the music →'}
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Pill submit button — always visible below the textarea */}
+      <div className="flex justify-center" style={{ marginTop: '1rem' }}>
+        <button
+          type="submit"
+          disabled={!canSubmit}
+          className="transition-all focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          style={{
+            background: 'var(--muse-primary)',
+            borderRadius: '50px',
+            padding: '0.65rem 1.75rem',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            letterSpacing: '0.02em',
+            color: 'white',
+            boxShadow: canSubmit ? '0 4px 24px var(--glow-primary-soft)' : 'none',
+            border: 'none',
+            cursor: canSubmit ? 'pointer' : 'not-allowed',
+            opacity: canSubmit ? 1 : 0.4,
+            transition: 'opacity 0.2s ease, box-shadow 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            if (!canSubmit) return
+            ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
+            ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 32px var(--glow-primary-soft)'
+          }}
+          onMouseLeave={(e) => {
+            ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
+            ;(e.currentTarget as HTMLButtonElement).style.boxShadow = canSubmit ? '0 4px 24px var(--glow-primary-soft)' : 'none'
+          }}
+          onMouseDown={(e) => {
+            if (!canSubmit) return
+            ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
+          }}
+        >
+          {isLoading ? 'Finding…' : 'Feel the music →'}
+        </button>
+      </div>
     </form>
   )
 }

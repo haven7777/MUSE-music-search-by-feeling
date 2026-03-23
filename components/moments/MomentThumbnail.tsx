@@ -19,7 +19,7 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
   const router = useRouter()
 
   function handleClick() {
-    router.push(`/moments/${id}`)
+    router.push(`/?moment=${id}`)
   }
 
   const keywords = vibeProfile.sonicTexture?.slice(0, 3) ?? []

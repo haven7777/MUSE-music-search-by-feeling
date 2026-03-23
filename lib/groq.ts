@@ -131,6 +131,7 @@ interface RankResult {
   trackId: string
   rank: number
   explanation: string
+  confidence: number
 }
 
 export async function rankTracks(
@@ -178,10 +179,12 @@ Return ONLY valid JSON — an array of ranked results:
   {
     "trackId": "id from above",
     "rank": 1,
-    "explanation": "One sentence, max 120 chars, specific to THIS feeling, never generic. Reference a musical element if possible."
+    "explanation": "One sentence, max 120 chars, specific to THIS feeling, never generic. Reference a musical element if possible.",
+    "confidence": 0.85
   }
 ]
 
+confidence: 0.0-1.0 — how well this track genuinely fits the feeling (below 0.6 = poor fit).
 Order by fit with the feeling (rank 1 = best match).
 Include ALL tracks provided. No markdown, just JSON array.`,
       },
@@ -205,6 +208,7 @@ Include ALL tracks provided. No markdown, just JSON array.`,
       source: t.source,
       rank: result?.rank ?? i + 1,
       explanation: result?.explanation ?? 'Selected for your mood',
+      confidence: result?.confidence ?? 1,
       track: t.track,
     }
   })

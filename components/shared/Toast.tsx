@@ -24,7 +24,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setToasts((prev) => [...prev, { id, message, type }])
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
-    }, 3000)
+    }, 2500)
   }, [])
 
   return (
@@ -45,10 +45,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               transition={{ duration: 0.2 }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium pointer-events-auto"
               style={{
-                background: 'rgba(20,20,30,0.95)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: toast.type === 'success'
+                  ? 'rgba(var(--muse-primary-rgb, 139,92,246), 0.92)'
+                  : 'rgba(20,20,30,0.95)',
+                border: toast.type === 'success'
+                  ? '1px solid rgba(var(--muse-primary-rgb, 139,92,246), 0.5)'
+                  : '1px solid rgba(255,255,255,0.12)',
                 backdropFilter: 'blur(12px)',
-                color: 'var(--text-primary)',
+                color: 'white',
                 boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
               }}
             >

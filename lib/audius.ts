@@ -2,7 +2,12 @@ import { AudiusTrack } from '@/types'
 import { formatCount, sanitizeTitle } from './utils'
 
 const AUDIUS_BASE = 'https://api.audius.co/v1'
-const MIN_PLAY_COUNT = 10 // lowered to get more results for niche moods
+const MIN_PLAY_COUNT = 10
+
+const KIDS_KEYWORDS = [
+  'kids', 'children', "children's", 'lullaby', 'lullabies', 'nursery',
+  'toddler', 'baby songs', 'cocomelon', 'kidz bop',
+]
 
 interface AudiusRawTrack {
   id: string
@@ -13,6 +18,19 @@ interface AudiusRawTrack {
   favorite_count: number
   duration: number
   tags: string | null
+}
+
+function isKidsContent(raw: AudiusRawTrack): boolean {
+  const titleLower = raw.title.toLowerCase()
+  const tagsLower = (raw.tags ?? '').toLowerCase()
+  return KIDS_KEYWORDS.some((kw) => titleLower.includes(kw) || tagsLower.includes(kw))
+}
+
+function isLatinScript(text: string): boolean {
+  const letters = text.replace(/[\s\d.,!?'"()\-&_]/g, '')
+  if (letters.length === 0) return true
+  const nonLatinCount = letters.replace(/[\u0000-\u024F\u1E00-\u1EFF]/g, '').length
+  return nonLatinCount / letters.length < 0.3
 }
 
 function mapAudiusTrack(raw: AudiusRawTrack): AudiusTrack {
@@ -37,7 +55,7 @@ function mapAudiusTrack(raw: AudiusRawTrack): AudiusTrack {
   }
 }
 
-export async function searchAudiusTracks(query: string, limit = 10): Promise<AudiusTrack[]> {
+export async function searchAudiusTracks(query: string, limit = 10): Promise<AudiusRawTrack[]> {
   try {
     const url = `${AUDIUS_BASE}/tracks/search?query=${encodeURIComponent(query)}&limit=${limit}`
     const res = await fetch(url, {
@@ -47,20 +65,14 @@ export async function searchAudiusTracks(query: string, limit = 10): Promise<Aud
     if (!res.ok) return []
 
     const data = (await res.json()) as { data: AudiusRawTrack[] }
-    const tracks = data.data ?? []
-
-    return tracks
-      .filter((t) => t.play_count >= MIN_PLAY_COUNT && t.duration > 60)
-      .map(mapAudiusTrack)
+    return (data.data ?? []).filter((t) => t.play_count >= MIN_PLAY_COUNT && t.duration > 60)
   } catch {
     return []
   }
 }
 
-// Fallback genre queries used when mood-specific searches return nothing
 function buildFallbackQueries(queries: string[]): string[] {
   const genres = ['lo-fi', 'indie', 'ambient', 'bedroom pop', 'alternative', 'chill']
-  // Extract any single keyword from original queries
   const words = queries
     .flatMap((q) => q.split(' '))
     .filter((w) => w.length > 3)
@@ -69,23 +81,25 @@ function buildFallbackQueries(queries: string[]): string[] {
   return [...words.map((w) => `${w} indie`), ...genres.slice(0, 3)]
 }
 
-export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[]> {
-  const results = await Promise.all(queries.map((q) => searchAudiusTracks(q, 20)))
+export async function fetchAudiusTracks(
+  queries: string[],
+  inputIsLatin = true,
+): Promise<AudiusTrack[]> {
+  const rawResults = await Promise.all(queries.map((q) => searchAudiusTracks(q, 20)))
 
   const seen = new Set<string>()
-  const all: AudiusTrack[] = []
+  let allRaw: AudiusRawTrack[] = []
 
-  for (const tracks of results) {
+  for (const tracks of rawResults) {
     for (const track of tracks) {
       if (!seen.has(track.id)) {
         seen.add(track.id)
-        all.push(track)
+        allRaw.push(track)
       }
     }
   }
 
-  // If we have fewer than 8 tracks, broaden with fallback queries
-  if (all.length < 8) {
+  if (allRaw.length < 8) {
     const fallbackQueries = buildFallbackQueries(queries)
     const fallbackResults = await Promise.all(
       fallbackQueries.map((q) => searchAudiusTracks(q, 15)),
@@ -94,13 +108,22 @@ export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[
       for (const track of tracks) {
         if (!seen.has(track.id)) {
           seen.add(track.id)
-          all.push(track)
+          allRaw.push(track)
         }
       }
     }
   }
 
-  // Artist diversity: max 1 track per artist (first pass)
+  // Filter kids content
+  allRaw = allRaw.filter((t) => !isKidsContent(t))
+
+  // Filter non-Latin titles when user typed in English
+  if (inputIsLatin) {
+    allRaw = allRaw.filter((t) => isLatinScript(t.title))
+  }
+
+  const all = allRaw.map(mapAudiusTrack)
+
   const seenArtists = new Set<string>()
   const diverse: AudiusTrack[] = []
   all.sort((a, b) => b.playCount - a.playCount)
@@ -113,7 +136,6 @@ export async function fetchAudiusTracks(queries: string[]): Promise<AudiusTrack[
     if (diverse.length >= 8) break
   }
 
-  // Fill remaining slots allowing repeat artists if needed
   if (diverse.length < 8) {
     for (const track of all) {
       if (!diverse.find((d) => d.id === track.id)) {

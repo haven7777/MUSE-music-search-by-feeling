@@ -16,6 +16,8 @@ import { HeroInput } from '@/components/home/HeroInput'
 import { MoodChips } from '@/components/home/MoodChips'
 import { ProcessingState } from '@/components/home/ProcessingState'
 import { ResultsPage } from '@/components/results/ResultsPage'
+import { useAudio } from '@/components/shared/AudioContext'
+import { getPlaylistById } from '@/lib/storage'
 
 function HomePageInner() {
   const [phase, setPhase] = useState<AppPhase>('input')
@@ -25,17 +27,39 @@ function HomePageInner() {
   const [errorMessage, setErrorMessage] = useState('')
   const searchParams = useSearchParams()
   const didAutoSubmit = useRef(false)
+  const { pause } = useAudio()
 
-  // Handle re-explore via ?q= param
   useEffect(() => {
     if (didAutoSubmit.current) return
+    didAutoSubmit.current = true
+
+    // Load a saved moment by ID
+    const momentId = searchParams.get('moment')
+    if (momentId) {
+      const saved = getPlaylistById(momentId)
+      if (saved) {
+        setPlaylist(saved)
+        setPhase('results')
+        return
+      }
+    }
+
+    // Re-run a search from ?q= param
     const q = searchParams.get('q')
     if (q) {
-      didAutoSubmit.current = true
       void handleSubmit(decodeURIComponent(q))
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Clear vibe colors whenever home/input phase is active
+  useEffect(() => {
+    if (phase === 'input') {
+      ;['--muse-primary', '--muse-secondary', '--muse-bg', '--muse-text', '--muse-surface', '--muse-primary-rgb', '--muse-secondary-rgb'].forEach(
+        (v) => document.documentElement.style.removeProperty(v),
+      )
+    }
+  }, [phase])
 
   async function handleSubmit(input: string) {
     setLastInput(input)
@@ -69,7 +93,7 @@ function HomePageInner() {
       const searchRes = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vibeProfile }),
+        body: JSON.stringify({ vibeProfile, originalInput: input }),
       })
 
       if (!searchRes.ok) throw new Error('Music search failed')
@@ -79,8 +103,8 @@ function HomePageInner() {
         audius: AudiusTrack[]
       }
 
-      // Step 3: Fetch iTunes previews
-      const itunesRes = await fetch('/api/itunes', {
+      // Step 3: Fetch Deezer previews for Spotify tracks
+      const previewRes = await fetch('/api/itunes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,8 +113,8 @@ function HomePageInner() {
       })
 
       let previewMap: Record<string, string | null> = {}
-      if (itunesRes.ok) {
-        const data = (await itunesRes.json()) as { previews: Record<string, string | null> }
+      if (previewRes.ok) {
+        const data = (await previewRes.json()) as { previews: Record<string, string | null> }
         previewMap = data.previews
       }
 
@@ -113,7 +137,18 @@ function HomePageInner() {
 
       let rankedTracks: RankedTrack[] = []
       if (rankRes.ok) {
-        rankedTracks = (await rankRes.json()) as RankedTrack[]
+        const all = (await rankRes.json()) as RankedTrack[]
+        // Drop tracks with low confidence but keep at least 4 per source
+        const spotifyRanked = all.filter((t) => t.source === 'spotify')
+        const audiusRanked = all.filter((t) => t.source === 'audius')
+        const filterWithFloor = (tracks: RankedTrack[], floor: number) => {
+          const good = tracks.filter((t) => (t.confidence ?? 1) >= 0.6)
+          return good.length >= floor ? good : tracks.slice(0, Math.max(floor, good.length))
+        }
+        rankedTracks = [
+          ...filterWithFloor(spotifyRanked, 4),
+          ...filterWithFloor(audiusRanked, 4),
+        ].sort((a, b) => a.rank - b.rank)
       } else {
         rankedTracks = allTracks.map((t, i) => ({
           source: t.source,
@@ -139,6 +174,7 @@ function HomePageInner() {
   }
 
   function handleReset() {
+    pause()
     setPhase('input')
     setPlaylist(null)
     setProcessingKeywords([])
@@ -175,7 +211,6 @@ function HomePageInner() {
 
             {/* Wordmark */}
             <div className="flex flex-col items-center relative" style={{ gap: '0.5rem' }}>
-              {/* Ambient glow behind wordmark */}
               <div
                 className="absolute -inset-8 rounded-full pointer-events-none"
                 style={{
@@ -199,7 +234,6 @@ function HomePageInner() {
                 MUSE
               </h1>
 
-              {/* Decorative line */}
               <motion.div
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
@@ -214,7 +248,6 @@ function HomePageInner() {
                 aria-hidden="true"
               />
 
-              {/* Tagline */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -273,8 +306,15 @@ function HomePageInner() {
             >
               <button
                 onClick={handleReset}
-                className="text-[0.75rem] uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-                style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
+                className="text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  color: 'rgba(255,255,255,0.85)',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  padding: '0.35rem 0.75rem',
+                  fontWeight: 600,
+                }}
               >
                 ← New Feeling
               </button>
@@ -283,8 +323,15 @@ function HomePageInner() {
               </span>
               <Link
                 href="/moments"
-                className="text-[0.75rem] uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-                style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
+                className="text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  color: 'rgba(255,255,255,0.85)',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  padding: '0.35rem 0.75rem',
+                  fontWeight: 600,
+                }}
               >
                 Moments
               </Link>

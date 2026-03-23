@@ -4,6 +4,12 @@ import { clamp, sanitizeTitle } from './utils'
 
 const KEY_LABELS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
+const KIDS_KEYWORDS = [
+  'kids', 'children', "children's", 'lullaby', 'lullabies', 'nursery',
+  'toddler', 'baby songs', 'sesame street', 'disney junior', 'cocomelon',
+  'kidz bop', 'kidzbop', 'nursery rhyme',
+]
+
 interface SpotifyRawTrack {
   id: string
   name: string
@@ -27,6 +33,19 @@ interface SpotifyRawFeatures {
   mode: number
 }
 
+function isKidsContent(track: SpotifyRawTrack): boolean {
+  const albumLower = track.album.name.toLowerCase()
+  const nameLower = track.name.toLowerCase()
+  return KIDS_KEYWORDS.some((kw) => albumLower.includes(kw) || nameLower.includes(kw))
+}
+
+function isLatinScript(text: string): boolean {
+  const letters = text.replace(/[\s\d.,!?'"()\-&_]/g, '')
+  if (letters.length === 0) return true
+  const nonLatinCount = letters.replace(/[\u0000-\u024F\u1E00-\u1EFF]/g, '').length
+  return nonLatinCount / letters.length < 0.3
+}
+
 export async function searchTracks(query: string, token: string): Promise<SpotifyRawTrack[]> {
   const params = new URLSearchParams({ q: query, type: 'track', limit: '10' })
   const url = `https://api.spotify.com/v1/search?${params.toString()}`
@@ -37,47 +56,6 @@ export async function searchTracks(query: string, token: string): Promise<Spotif
   if (!res.ok) return []
   const data = (await res.json()) as { tracks: { items: SpotifyRawTrack[] } }
   return data.tracks?.items ?? []
-}
-
-async function getRecommendations(
-  vibeProfile: VibeProfile,
-  token: string,
-): Promise<SpotifyRawTrack[]> {
-  const genres = (vibeProfile.spotifyGenres ?? ['indie', 'sad'])
-    .slice(0, 3)
-    .join(',')
-
-  const energy = clamp(vibeProfile.energyLevel / 100, 0, 1)
-  const valence = clamp(vibeProfile.valenceTarget, 0, 1)
-  const danceability = clamp((vibeProfile.danceability ?? 50) / 100, 0, 1)
-  const acousticness = clamp((vibeProfile.acousticness ?? 50) / 100, 0, 1)
-  const instrumentalness = clamp((vibeProfile.instrumentalness ?? 10) / 100, 0, 1)
-  const tempo = Math.round(
-    ((vibeProfile.tempoRange?.min ?? 70) + (vibeProfile.tempoRange?.max ?? 120)) / 2,
-  )
-
-  const params = new URLSearchParams({
-    seed_genres: genres,
-    target_energy: energy.toFixed(3),
-    target_valence: valence.toFixed(3),
-    target_danceability: danceability.toFixed(3),
-    target_acousticness: acousticness.toFixed(3),
-    target_instrumentalness: instrumentalness.toFixed(3),
-    target_tempo: String(tempo),
-    min_energy: clamp(energy - 0.2, 0, 1).toFixed(3),
-    max_energy: clamp(energy + 0.2, 0, 1).toFixed(3),
-    min_valence: clamp(valence - 0.3, 0, 1).toFixed(3),
-    max_valence: clamp(valence + 0.3, 0, 1).toFixed(3),
-    limit: '25',
-  })
-
-  const res = await fetch(`https://api.spotify.com/v1/recommendations?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-
-  if (!res.ok) return []
-  const data = (await res.json()) as { tracks: SpotifyRawTrack[] }
-  return data.tracks ?? []
 }
 
 export async function getAudioFeatures(
@@ -225,13 +203,13 @@ function buildSpotifyFallback(vibeProfile: VibeProfile): string[] {
 export async function fetchSpotifyTracks(
   queries: string[],
   vibeProfile: VibeProfile,
+  inputIsLatin = true,
 ): Promise<SpotifyTrackData[]> {
   const token = await getSpotifyToken()
 
-  // Collect from all search queries (recommendations API deprecated Nov 2024)
   const rawResults = await Promise.all(queries.map((q) => searchTracks(q, token)))
   const seen = new Set<string>()
-  const allRaw: SpotifyRawTrack[] = []
+  let allRaw: SpotifyRawTrack[] = []
 
   for (const results of rawResults) {
     for (const track of results) {
@@ -242,7 +220,6 @@ export async function fetchSpotifyTracks(
     }
   }
 
-  // Broaden with fallback queries if we don't have enough candidates
   if (allRaw.length < 16) {
     const fallbackQueries = buildSpotifyFallback(vibeProfile)
     const fallbackResults = await Promise.all(fallbackQueries.map((q) => searchTracks(q, token)))
@@ -254,6 +231,14 @@ export async function fetchSpotifyTracks(
         }
       }
     }
+  }
+
+  // Filter kids content
+  allRaw = allRaw.filter((t) => !isKidsContent(t))
+
+  // Filter non-Latin titles when user typed in English
+  if (inputIsLatin) {
+    allRaw = allRaw.filter((t) => isLatinScript(t.name))
   }
 
   const allIds = allRaw.map((t) => t.id)

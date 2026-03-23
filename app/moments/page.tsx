@@ -15,8 +15,15 @@ export default function MomentsPage() {
           <div>
             <Link
               href="/"
-              className="text-[0.75rem] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 block mb-3"
-              style={{ color: 'var(--text-muted)' }}
+              className="text-[0.75rem] font-mono uppercase tracking-widest transition-all hover:opacity-100 inline-flex items-center gap-1 mb-3"
+              style={{
+                color: 'rgba(255,255,255,0.75)',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                padding: '0.3rem 0.75rem',
+                borderRadius: '50px',
+                fontWeight: 600,
+              }}
             >
               ← Back to MUSE
             </Link>
@@ -26,7 +33,7 @@ export default function MomentsPage() {
             >
               Saved Moments
             </h1>
-            <p className="text-[0.85rem] mt-1" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-[0.9rem] mt-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Every feeling you translated into music.
             </p>
           </div>

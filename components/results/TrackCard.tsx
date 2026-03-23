@@ -1,10 +1,12 @@
 'use client'
 
-import { ExternalLink } from 'lucide-react'
+import { useState } from 'react'
+import { Bookmark, ExternalLink } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { AudiusTrack, SpotifyTrackData, TrackCardProps } from '@/types'
 import { truncateTitle } from '@/lib/utils'
 import { useAudio } from '@/components/shared/AudioContext'
+import { isFavoriteTrack, addFavoriteTrack, removeFavoriteTrack } from '@/lib/storage'
 import { FullPlayer } from './FullPlayer'
 import { MiniPlayer } from './MiniPlayer'
 
@@ -26,7 +28,7 @@ function AudiusIcon() {
   )
 }
 
-export function TrackCard({ rankedTrack, index, onOpen }: TrackCardProps) {
+export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardProps) {
   const { source, track } = rankedTrack
   const { currentTrackId, isPlaying } = useAudio()
   const isSpotify = source === 'spotify'
@@ -38,7 +40,30 @@ export function TrackCard({ rankedTrack, index, onOpen }: TrackCardProps) {
   const displayTitle = truncateTitle(rawTitle)
   const isThisPlaying = currentTrackId === track.id && isPlaying
 
+  const [isSaved, setIsSaved] = useState(() => isFavoriteTrack(track.id))
+
   function stopProp(e: React.MouseEvent) { e.stopPropagation() }
+
+  function toggleSaved(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (isSaved) {
+      removeFavoriteTrack(track.id)
+      setIsSaved(false)
+    } else {
+      addFavoriteTrack({
+        id: track.id,
+        source,
+        title: track.title,
+        artist: track.artist,
+        coverArt: track.coverArt ?? '',
+        savedAt: Date.now(),
+        moodLabel,
+        spotifyUrl: spotifyTrack?.spotifyUrl,
+        streamUrl: audiusTrack?.streamUrl,
+      })
+      setIsSaved(true)
+    }
+  }
 
   return (
     <motion.div
@@ -51,7 +76,7 @@ export function TrackCard({ rankedTrack, index, onOpen }: TrackCardProps) {
       }}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.4, ease: 'easeOut' }}
+      transition={{ delay: index * 0.07, duration: 0.35, ease: 'easeOut' }}
       className="track-card group"
       style={{
         padding: 0,
@@ -76,6 +101,29 @@ export function TrackCard({ rankedTrack, index, onOpen }: TrackCardProps) {
           }}
         />
       )}
+
+      {/* Bookmark button — top-right, visible on hover or when saved */}
+      <button
+        onClick={toggleSaved}
+        aria-label={isSaved ? 'Remove from saved songs' : 'Save this song'}
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          zIndex: 2,
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          padding: '4px',
+          borderRadius: '6px',
+          color: isSaved ? 'var(--muse-primary)' : 'rgba(255,255,255,0.5)',
+          opacity: isSaved ? 1 : 0,
+          transition: 'opacity 0.15s ease, color 0.15s ease',
+        }}
+        className="group-hover:opacity-100"
+      >
+        <Bookmark size={14} fill={isSaved ? 'currentColor' : 'none'} />
+      </button>
 
       <div style={{ padding: '1rem' }}>
         <div className="flex gap-3">

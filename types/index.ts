@@ -64,6 +64,7 @@ export interface RankedTrack {
   source: 'spotify' | 'audius'
   rank: number
   explanation: string
+  confidence?: number
   track: SpotifyTrackData | AudiusTrack
 }
 
@@ -82,6 +83,7 @@ export interface FavoriteTrack {
   artist: string
   coverArt: string
   savedAt: number
+  moodLabel?: string
   spotifyUrl?: string
   streamUrl?: string
 }

@@ -25,7 +25,6 @@ export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading
       {showHeader && (
         <div className="mb-1">
           <div className="flex items-center gap-2">
-            {/* Thin vertical bar */}
             <div
               style={{
                 width: '2px',
@@ -60,6 +59,53 @@ export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading
                     }}
                   >
                     ({tracks.length} tracks)
+                  </span>
+                )}
+                {isUnderground && (
+                  <span
+                    className="underground-tooltip-wrap"
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', cursor: 'default' }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-geist-mono)',
+                        fontSize: '0.62rem',
+                        color: 'var(--text-muted)',
+                        opacity: 0.5,
+                        userSelect: 'none',
+                      }}
+                    >
+                      ⓘ
+                    </span>
+                    <span
+                      className="underground-tooltip"
+                      style={{
+                        position: 'absolute',
+                        bottom: 'calc(100% + 6px)',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'rgba(10,10,20,0.97)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        borderRadius: '8px',
+                        padding: '0.5rem 0.75rem',
+                        fontSize: '0.72rem',
+                        color: 'rgba(255,255,255,0.8)',
+                        whiteSpace: 'nowrap',
+                        pointerEvents: 'none',
+                        opacity: 0,
+                        transition: 'opacity 0.15s ease',
+                        zIndex: 50,
+                        fontFamily: 'var(--font-geist-sans)',
+                        lineHeight: 1.5,
+                        maxWidth: '260px',
+                        whiteSpaceCollapse: 'collapse',
+                      } as React.CSSProperties}
+                    >
+                      Lesser-known artists curated to match your vibe — full tracks, no 30s limits.
+                    </span>
+                    <style>{`
+                      .underground-tooltip-wrap:hover .underground-tooltip { opacity: 1 !important; }
+                    `}</style>
                   </span>
                 )}
               </div>
