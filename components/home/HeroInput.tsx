@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Send } from 'lucide-react'
 import { motion, useAnimation } from 'framer-motion'
+import Link from 'next/link'
 import { TypewriterPlaceholder } from './TypewriterPlaceholder'
 
 interface HeroInputProps {
@@ -188,7 +189,7 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
       </motion.div>
 
       {/* Pill submit button — always visible below the textarea */}
-      <div className="flex justify-center" style={{ marginTop: '1rem' }}>
+      <div className="flex justify-center items-center gap-3" style={{ marginTop: '1rem' }}>
         <button
           type="submit"
           disabled={!canSubmit}
@@ -223,6 +224,22 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
         >
           {isLoading ? 'Finding…' : 'Feel the music →'}
         </button>
+        <Link
+          href="/moments"
+          className="transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full"
+          style={{
+            fontFamily: 'var(--font-geist-mono)',
+            fontSize: '0.82rem',
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.85)',
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            padding: '0.65rem 1.1rem',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Saved Music &amp; Moments
+        </Link>
       </div>
     </form>
   )

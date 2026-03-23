@@ -198,23 +198,6 @@ function HomePageInner() {
             transition={{ duration: 0.4 }}
             className="flex-1 flex flex-col items-center justify-center px-4 gap-8 min-h-screen relative"
           >
-            {/* Nav */}
-            <div className="absolute top-6 right-6">
-              <Link
-                href="/moments"
-                className="text-[0.8rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-full"
-                style={{
-                  fontFamily: 'var(--font-geist-mono)',
-                  color: 'rgba(255,255,255,0.9)',
-                  background: 'rgba(255,255,255,0.12)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  padding: '0.45rem 1rem',
-                  fontWeight: 600,
-                }}
-              >
-                Saved Moments
-              </Link>
-            </div>
 
             {/* Wordmark */}
             <div className="flex flex-col items-center relative" style={{ gap: '0.5rem' }}>
