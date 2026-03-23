@@ -80,14 +80,13 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                   fontSize: '0.72rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.15em',
-                  color: 'var(--muse-primary)',
+                  color: 'rgba(255,255,255,0.55)',
                   marginBottom: '0.4rem',
                 }}
               >
                 Your vibe
               </p>
               <h2
-                className="gradient-text"
                 style={{
                   fontFamily: 'var(--font-syne)',
                   fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
@@ -95,6 +94,8 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                   letterSpacing: '-0.02em',
                   lineHeight: 1.15,
                   marginBottom: '0.5rem',
+                  color: '#ffffff',
+                  textShadow: '0 2px 20px rgba(0,0,0,0.4)',
                 }}
               >
                 {moodLabel}
@@ -103,7 +104,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                 style={{
                   fontSize: '1rem',
                   fontStyle: 'italic',
-                  color: 'var(--text-secondary)',
+                  color: 'rgba(255,255,255,0.75)',
                   lineHeight: 1.55,
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
@@ -184,9 +185,9 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                   letterSpacing: '0.05em',
                   padding: '0.25rem 0.65rem',
                   borderRadius: '50px',
-                  background: 'rgba(var(--muse-primary-rgb), 0.1)',
-                  border: '1px solid rgba(var(--muse-primary-rgb), 0.22)',
-                  color: 'var(--muse-primary)',
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  color: 'rgba(255,255,255,0.9)',
                 }}
               >
                 {kw}
