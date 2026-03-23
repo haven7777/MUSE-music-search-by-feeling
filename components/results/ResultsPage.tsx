@@ -72,7 +72,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
 
   return (
     <div className="min-h-screen pb-20">
-      <div style={{ maxWidth: '680px', margin: '0 auto', padding: '0 1rem' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 1.5rem' }}>
 
         {/* ── Compact hero header ──────────────────────────────── */}
         <motion.section
@@ -87,7 +87,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
               <p
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.6rem',
+                  fontSize: '0.72rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.15em',
                   color: 'var(--muse-primary)',
@@ -100,7 +100,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                 className="gradient-text"
                 style={{
                   fontFamily: 'var(--font-syne)',
-                  fontSize: 'clamp(1.4rem, 4vw, 2rem)',
+                  fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
                   fontWeight: 800,
                   letterSpacing: '-0.02em',
                   lineHeight: 1.15,
@@ -111,7 +111,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
               </h2>
               <p
                 style={{
-                  fontSize: '0.88rem',
+                  fontSize: '1rem',
                   fontStyle: 'italic',
                   color: 'var(--text-secondary)',
                   lineHeight: 1.55,
@@ -198,11 +198,11 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                   transition={{ delay: 0.2 + i * 0.06, duration: 0.25 }}
                   style={{
                     fontFamily: 'var(--font-geist-mono)',
-                    fontSize: '0.62rem',
+                    fontSize: '0.72rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
-                    padding: '0.2rem 0.55rem',
+                    padding: '0.25rem 0.65rem',
                     borderRadius: '50px',
                     background: 'rgba(var(--muse-primary-rgb), 0.1)',
                     border: '1px solid rgba(var(--muse-primary-rgb), 0.22)',
@@ -236,7 +236,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
               <span
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.58rem',
+                  fontSize: '0.68rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
                   color: 'var(--text-muted)',
@@ -284,7 +284,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                 transition: 'all 0.2s ease',
                 color: activeTab === tab.key ? 'var(--muse-text)' : 'var(--text-muted)',
                 fontFamily: 'var(--font-geist-sans)',
-                fontSize: '0.82rem',
+                fontSize: '0.95rem',
                 fontWeight: activeTab === tab.key ? 600 : 400,
               }}
             >

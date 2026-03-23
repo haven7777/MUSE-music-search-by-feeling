@@ -89,9 +89,15 @@ export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading
         </div>
       )}
 
-      <div className="flex flex-col gap-3">
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '0.75rem',
+        }}
+      >
         {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => <TrackCardSkeleton key={i} />)
+          Array.from({ length: 6 }).map((_, i) => <TrackCardSkeleton key={i} />)
         ) : tracks.length === 0 ? (
           <div
             className="rounded-2xl p-6 text-center"

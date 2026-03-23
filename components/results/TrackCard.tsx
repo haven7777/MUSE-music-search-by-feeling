@@ -73,6 +73,7 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
         overflow: 'hidden',
         cursor: 'pointer',
         position: 'relative',
+        gridColumn: isExpanded ? 'span 2' : undefined,
         borderLeftColor: isThisPlaying
           ? 'var(--muse-primary)'
           : isExpanded
@@ -144,14 +145,14 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p
-                  className="font-semibold text-[0.88rem] leading-tight truncate"
+                  className="font-semibold text-[1rem] leading-tight truncate"
                   title={rawTitle}
                   style={{ color: 'var(--muse-text)' }}
                 >
                   {displayTitle}
                 </p>
                 <p
-                  className="text-[0.78rem] mt-0.5 truncate"
+                  className="text-[0.88rem] mt-0.5 truncate"
                   title={artist}
                   style={{ color: 'var(--text-secondary)' }}
                 >
@@ -251,7 +252,7 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
               />
               <span
                 style={{
-                  fontSize: '0.65rem',
+                  fontSize: '0.75rem',
                   fontStyle: 'italic',
                   color: 'var(--text-muted)',
                 }}
@@ -302,7 +303,7 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
                 />
                 <span
                   style={{
-                    fontSize: '0.62rem',
+                    fontSize: '0.72rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
@@ -333,7 +334,7 @@ export function TrackCard({ rankedTrack, index, vibeKeywords, moodLabel, isExpan
                 </span>
                 <p
                   style={{
-                    fontSize: '0.92rem',
+                    fontSize: '1rem',
                     fontStyle: 'italic',
                     color: 'color-mix(in srgb, var(--muse-text) 92%, transparent)',
                     lineHeight: 1.7,
