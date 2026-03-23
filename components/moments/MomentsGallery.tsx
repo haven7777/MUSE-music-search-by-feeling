@@ -95,7 +95,7 @@ export function MomentsGallery() {
       {hasPlaylists && (
         <section style={{ marginBottom: hasSongs ? '3rem' : 0 }}>
           <div className="flex items-center justify-between mb-6">
-            <p className="text-[0.75rem]" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}>
+            <p className="text-[0.95rem] font-semibold" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-secondary)' }}>
               {playlists.length}/{MAX} moments saved
             </p>
             {!showClearConfirm ? (
@@ -154,11 +154,11 @@ export function MomentsGallery() {
       {hasSongs && (
         <section>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-            <div style={{ width: '2px', height: '18px', background: 'var(--muse-primary)', borderRadius: '1px' }} />
-            <h2 style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 400 }}>
+            <div style={{ width: '3px', height: '22px', background: 'var(--muse-primary)', borderRadius: '2px' }} />
+            <h2 style={{ fontFamily: 'var(--font-syne)', fontSize: '1.1rem', letterSpacing: '0.05em', color: 'var(--text-secondary)', fontWeight: 700 }}>
               Saved Songs
             </h2>
-            <span style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', opacity: 0.6 }}>
+            <span style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               ({savedSongs.length})
             </span>
           </div>

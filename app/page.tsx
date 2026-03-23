@@ -202,8 +202,15 @@ function HomePageInner() {
             <div className="absolute top-6 right-6">
               <Link
                 href="/moments"
-                className="text-[0.75rem] uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-                style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}
+                className="text-[0.8rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-full"
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  color: 'rgba(255,255,255,0.9)',
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  padding: '0.45rem 1rem',
+                  fontWeight: 600,
+                }}
               >
                 Saved Moments
               </Link>
