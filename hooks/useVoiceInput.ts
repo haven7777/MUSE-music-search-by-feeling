@@ -61,7 +61,7 @@ export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions): 
     if (!SpeechRecognitionAPI) return
 
     const recognition = new SpeechRecognitionAPI()
-    recognition.continuous = false
+    recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = 'en-US'
 
