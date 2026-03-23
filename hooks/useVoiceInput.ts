@@ -38,6 +38,8 @@ export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions): 
   const [isListening, setIsListening] = useState(false)
   const [isSupported, setIsSupported] = useState(false)
   const recognitionRef = useRef<ISpeechRecognition | null>(null)
+  const stoppedByUserRef = useRef(false)
+  const SpeechRecognitionAPIRef = useRef<SpeechRecognitionConstructor | null>(null)
 
   useEffect(() => {
     setIsSupported('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
@@ -46,18 +48,8 @@ export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions): 
     }
   }, [])
 
-  function start() {
-    if (!isSupported) {
-      onError?.('not-supported')
-      return
-    }
-
-    const w = window as typeof window & {
-      SpeechRecognition?: SpeechRecognitionConstructor
-      webkitSpeechRecognition?: SpeechRecognitionConstructor
-    }
-    const SpeechRecognitionAPI = w.SpeechRecognition ?? w.webkitSpeechRecognition
-
+  function createAndStart() {
+    const SpeechRecognitionAPI = SpeechRecognitionAPIRef.current
     if (!SpeechRecognitionAPI) return
 
     const recognition = new SpeechRecognitionAPI()
@@ -76,24 +68,50 @@ export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions): 
     }
 
     recognition.onend = () => {
-      setIsListening(false)
-      recognitionRef.current = null
+      // Some browsers end recognition after silence even with continuous: true
+      // Auto-restart unless the user explicitly stopped
+      if (!stoppedByUserRef.current) {
+        createAndStart()
+      } else {
+        setIsListening(false)
+        recognitionRef.current = null
+      }
     }
 
     recognition.onerror = (event) => {
-      setIsListening(false)
-      recognitionRef.current = null
       if (event.error === 'not-allowed') {
+        stoppedByUserRef.current = true
+        setIsListening(false)
+        recognitionRef.current = null
         onError?.('permission-denied')
       }
-      // 'no-speech' and others: silently reset
+      // 'no-speech' and others: let onend handle restart
     }
 
     recognitionRef.current = recognition
     recognition.start()
   }
 
+  function start() {
+    if (!isSupported) {
+      onError?.('not-supported')
+      return
+    }
+
+    const w = window as typeof window & {
+      SpeechRecognition?: SpeechRecognitionConstructor
+      webkitSpeechRecognition?: SpeechRecognitionConstructor
+    }
+    const SpeechRecognitionAPI = w.SpeechRecognition ?? w.webkitSpeechRecognition
+    if (!SpeechRecognitionAPI) return
+
+    SpeechRecognitionAPIRef.current = SpeechRecognitionAPI
+    stoppedByUserRef.current = false
+    createAndStart()
+  }
+
   function stop() {
+    stoppedByUserRef.current = true
     recognitionRef.current?.stop()
   }
 
