@@ -34,6 +34,10 @@ export function applyColorPalette(palette: ColorPalette): void {
   root.style.setProperty('--muse-bg', palette.background)
   root.style.setProperty('--muse-text', palette.text)
   root.style.setProperty('--muse-surface', palette.surface)
+  const primaryRgb = hexToRgb(palette.primary)
+  if (primaryRgb) {
+    root.style.setProperty('--muse-primary-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`)
+  }
 }
 
 export function generateGradient(palette: ColorPalette): string {
