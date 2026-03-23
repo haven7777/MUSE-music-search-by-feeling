@@ -106,9 +106,9 @@ export function MomentsGallery() {
                   fontFamily: 'var(--font-geist-mono)',
                   fontSize: '0.8rem',
                   fontWeight: 600,
-                  color: 'rgba(255,255,255,0.7)',
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  color: '#fca5a5',
+                  background: 'rgba(239,68,68,0.12)',
+                  border: '1px solid rgba(239,68,68,0.35)',
                   padding: '0.35rem 0.85rem',
                 }}
               >
