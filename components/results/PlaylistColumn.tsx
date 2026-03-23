@@ -12,9 +12,10 @@ interface PlaylistColumnProps {
   vibeProfile: VibeProfile
   isLoading?: boolean
   isUnderground?: boolean
+  showHeader?: boolean
 }
 
-export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading, isUnderground }: PlaylistColumnProps) {
+export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading, isUnderground, showHeader = true }: PlaylistColumnProps) {
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null)
 
   function handleExpand(trackId: string) {
@@ -27,64 +28,66 @@ export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading
   return (
     <div className="flex flex-col gap-3">
       {/* Column header */}
-      <div className="mb-1">
-        <div className="flex items-center gap-2">
-          {/* Thin vertical bar */}
-          <div
-            style={{
-              width: '2px',
-              height: '18px',
-              background: dotColor,
-              borderRadius: '1px',
-              flexShrink: 0,
-            }}
-          />
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h2
-                style={{
-                  fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.65rem',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: 'var(--text-muted)',
-                  fontWeight: 400,
-                }}
-              >
-                {title}
-              </h2>
-              {tracks.length > 0 && (
-                <span
+      {showHeader && (
+        <div className="mb-1">
+          <div className="flex items-center gap-2">
+            {/* Thin vertical bar */}
+            <div
+              style={{
+                width: '2px',
+                height: '18px',
+                background: dotColor,
+                borderRadius: '1px',
+                flexShrink: 0,
+              }}
+            />
+            <div>
+              <div className="flex items-center gap-1.5">
+                <h2
                   style={{
                     fontFamily: 'var(--font-geist-mono)',
-                    fontSize: '0.62rem',
-                    letterSpacing: '0.1em',
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
                     color: 'var(--text-muted)',
-                    opacity: 0.6,
+                    fontWeight: 400,
                   }}
                 >
-                  ({tracks.length} tracks)
-                </span>
+                  {title}
+                </h2>
+                {tracks.length > 0 && (
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-geist-mono)',
+                      fontSize: '0.62rem',
+                      letterSpacing: '0.1em',
+                      color: 'var(--text-muted)',
+                      opacity: 0.6,
+                    }}
+                  >
+                    ({tracks.length} tracks)
+                  </span>
+                )}
+              </div>
+              {isUnderground && (
+                <p
+                  style={{
+                    fontFamily: 'var(--font-geist-mono)',
+                    fontSize: '0.58rem',
+                    letterSpacing: '0.1em',
+                    color: 'var(--text-muted)',
+                    opacity: 0.55,
+                    marginTop: '0.15rem',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Independent · Audius
+                </p>
               )}
             </div>
-            {isUnderground && (
-              <p
-                style={{
-                  fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.58rem',
-                  letterSpacing: '0.1em',
-                  color: 'var(--text-muted)',
-                  opacity: 0.55,
-                  marginTop: '0.15rem',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Independent · Audius
-              </p>
-            )}
           </div>
         </div>
-      </div>
+      )}
 
       <div className="flex flex-col gap-3">
         {isLoading ? (

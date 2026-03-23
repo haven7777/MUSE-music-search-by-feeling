@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Bookmark, Share2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { MusePlaylist, RankedTrack } from '@/types'
 import { applyColorPalette } from '@/lib/colorSystem'
 import { savePlaylist, generateId } from '@/lib/storage'
 import { useToast } from '@/components/shared/Toast'
-import { MomentCard } from './MomentCard'
 import { PlaylistColumn } from './PlaylistColumn'
 import { VibeSignature } from './VibeSignature'
 
@@ -13,14 +14,19 @@ interface ResultsPageProps {
   playlist: MusePlaylist
 }
 
+type Tab = 'mainstream' | 'underground'
+
 export function ResultsPage({ playlist }: ResultsPageProps) {
   const { originalInput, vibeProfile, tracks } = playlist
+  const { moodLabel, emotionalCore, sonicTexture, energyLevel, colorPalette } = vibeProfile
   const [isSaved, setIsSaved] = useState(false)
+  const [activeTab, setActiveTab] = useState<Tab>('mainstream')
+  const [showSignature, setShowSignature] = useState(false)
   const { showToast } = useToast()
 
   useEffect(() => {
-    applyColorPalette(vibeProfile.colorPalette)
-  }, [vibeProfile.colorPalette])
+    applyColorPalette(colorPalette)
+  }, [colorPalette])
 
   function handleSave() {
     const toSave: MusePlaylist = { ...playlist, id: generateId(), createdAt: Date.now() }
@@ -29,10 +35,15 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
     showToast('Moment saved ✓', 'success')
   }
 
-  const spotifyTracks = tracks.filter((t) => t.source === 'spotify') as RankedTrack[]
-  const audiusTracks = tracks.filter((t) => t.source === 'audius') as RankedTrack[]
+  function handleShare() {
+    const slug = moodLabel.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    const url = `${window.location.origin}/vibe/${slug}`
+    void navigator.clipboard.writeText(url).then(() => {
+      showToast('Link copied!', 'success')
+    })
+  }
 
-  // Deduplicate by track ID within each column
+  // Dedup + split
   const seenIds = new Set<string>()
   const deduped = (list: RankedTrack[]) =>
     list.filter((t) => {
@@ -40,9 +51,8 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
       seenIds.add(t.track.id)
       return true
     })
-
-  const spotifyDeduped = deduped(spotifyTracks)
-  const audiusDeduped = deduped(audiusTracks)
+  const spotifyDeduped = deduped(tracks.filter((t) => t.source === 'spotify'))
+  const audiusDeduped = deduped(tracks.filter((t) => t.source === 'audius'))
 
   const spotifyWithFeatures = spotifyDeduped.find(
     (t) => t.source === 'spotify' && 'audioFeatures' in t.track && t.track.audioFeatures,
@@ -52,62 +62,351 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
       ? (spotifyWithFeatures.track.audioFeatures ?? {})
       : {}
 
+  const keywords = [emotionalCore, ...sonicTexture]
+    .slice(0, 5)
+    .map((k) => k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
+    .filter(Boolean)
+
+  const circumference = 2 * Math.PI * 14
+  const energyDash = (energyLevel / 100) * circumference
+
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-5xl mx-auto flex flex-col gap-10">
-        {/* Moment Card */}
-        <div style={{ paddingBottom: '1rem' }}>
-          <MomentCard
-            originalInput={originalInput}
-            vibeProfile={vibeProfile}
-            onSave={handleSave}
-            isSaved={isSaved}
-          />
-        </div>
+    <div className="min-h-screen pb-20">
+      <div style={{ maxWidth: '680px', margin: '0 auto', padding: '0 1rem' }}>
 
-        {/* Playlist columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <PlaylistColumn
-            title="From the World"
-            dotColor="#1DB954"
-            tracks={spotifyDeduped}
-            vibeProfile={vibeProfile}
-          />
+        {/* ── Compact hero header ──────────────────────────────── */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          style={{ paddingTop: '2rem', paddingBottom: '1.5rem' }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
+            {/* Left: identity */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  fontSize: '0.6rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.15em',
+                  color: 'var(--muse-primary)',
+                  marginBottom: '0.4rem',
+                }}
+              >
+                Your vibe
+              </p>
+              <h2
+                className="gradient-text"
+                style={{
+                  fontFamily: 'var(--font-syne)',
+                  fontSize: 'clamp(1.4rem, 4vw, 2rem)',
+                  fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.15,
+                  marginBottom: '0.5rem',
+                }}
+              >
+                {moodLabel}
+              </h2>
+              <p
+                style={{
+                  fontSize: '0.88rem',
+                  fontStyle: 'italic',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.55,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                &ldquo;{originalInput}&rdquo;
+              </p>
+            </div>
 
-          {/* Mobile section divider — only visible below lg breakpoint */}
-          <div className="lg:hidden flex items-center gap-3 my-2">
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
-            <span
-              style={{
-                fontFamily: 'var(--font-geist-mono)',
-                fontSize: '0.6rem',
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                color: 'var(--text-muted)',
-              }}
-            >
-              Underground
-            </span>
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.07)' }} />
+            {/* Right: actions */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, paddingTop: '0.25rem' }}>
+              <button
+                onClick={handleShare}
+                aria-label="Copy share link"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'var(--glass-1)',
+                  border: '1px solid var(--glass-border)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  color: 'var(--text-secondary)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--glass-border-bright)'
+                  e.currentTarget.style.color = 'var(--muse-text)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--glass-border)'
+                  e.currentTarget.style.color = 'var(--text-secondary)'
+                }}
+              >
+                <Share2 size={14} />
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaved}
+                aria-label={isSaved ? 'Moment saved' : 'Save this moment'}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: isSaved ? 'var(--muse-primary)' : 'var(--glass-1)',
+                  border: `1px solid ${isSaved ? 'var(--muse-primary)' : 'var(--glass-border)'}`,
+                  cursor: isSaved ? 'default' : 'pointer',
+                  transition: 'all 0.15s ease',
+                  opacity: isSaved ? 0.7 : 1,
+                  color: isSaved ? 'white' : 'var(--text-secondary)',
+                }}
+              >
+                <Bookmark size={14} fill={isSaved ? 'currentColor' : 'none'} />
+              </button>
+            </div>
           </div>
 
-          <PlaylistColumn
-            title="From the Underground"
-            dotColor="#CC0FE0"
-            tracks={audiusDeduped}
-            vibeProfile={vibeProfile}
-            isUnderground
-          />
+          {/* Keyword pills + energy row */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '0.75rem',
+              marginTop: '1rem',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {keywords.map((kw, i) => (
+                <motion.span
+                  key={kw}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + i * 0.06, duration: 0.25 }}
+                  style={{
+                    fontFamily: 'var(--font-geist-mono)',
+                    fontSize: '0.62rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    padding: '0.2rem 0.55rem',
+                    borderRadius: '50px',
+                    background: 'rgba(var(--muse-primary-rgb), 0.1)',
+                    border: '1px solid rgba(var(--muse-primary-rgb), 0.22)',
+                    color: 'var(--muse-primary)',
+                  }}
+                >
+                  {kw}
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Compact energy indicator */}
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}
+              title={`Energy: ${energyLevel}%`}
+            >
+              <svg width="32" height="32" viewBox="0 0 32 32" aria-label={`Energy ${energyLevel}%`}>
+                <circle cx="16" cy="16" r="14" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2.5" />
+                <circle
+                  cx="16" cy="16" r="14" fill="none"
+                  stroke="var(--muse-primary)" strokeWidth="2.5"
+                  strokeDasharray={`${energyDash} ${circumference}`}
+                  strokeLinecap="round"
+                  transform="rotate(-90 16 16)"
+                  strokeOpacity={0.9}
+                />
+                <text x="16" y="20" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.6)" fontFamily="monospace" fontWeight="bold">
+                  {energyLevel}
+                </text>
+              </svg>
+              <span
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  fontSize: '0.58rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                Energy
+              </span>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* ── Tab switcher ─────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+          style={{
+            display: 'flex',
+            borderBottom: '1px solid var(--glass-border)',
+            marginBottom: '1.25rem',
+            gap: 0,
+          }}
+        >
+          {(
+            [
+              { key: 'mainstream', label: 'Mainstream', count: spotifyDeduped.length, color: '#1DB954' },
+              { key: 'underground', label: 'Underground', count: audiusDeduped.length, color: '#CC0FE0' },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              style={{
+                flex: 1,
+                padding: '0.75rem 0',
+                background: 'none',
+                border: 'none',
+                borderBottom: `2px solid ${activeTab === tab.key ? tab.color : 'transparent'}`,
+                marginBottom: '-1px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s ease',
+                color: activeTab === tab.key ? 'var(--muse-text)' : 'var(--text-muted)',
+                fontFamily: 'var(--font-geist-sans)',
+                fontSize: '0.82rem',
+                fontWeight: activeTab === tab.key ? 600 : 400,
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: tab.color,
+                  opacity: activeTab === tab.key ? 1 : 0.4,
+                  flexShrink: 0,
+                  transition: 'opacity 0.2s ease',
+                }}
+              />
+              {tab.label}
+              {tab.count > 0 && (
+                <span
+                  style={{
+                    fontFamily: 'var(--font-geist-mono)',
+                    fontSize: '0.6rem',
+                    padding: '0.1rem 0.4rem',
+                    borderRadius: '50px',
+                    background: activeTab === tab.key
+                      ? `${tab.color}22`
+                      : 'var(--glass-1)',
+                    border: `1px solid ${activeTab === tab.key ? `${tab.color}44` : 'var(--glass-border)'}`,
+                    color: activeTab === tab.key ? tab.color : 'var(--text-muted)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </motion.div>
+
+        {/* ── Track list — animated tab switch ─────────────────── */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {activeTab === 'mainstream' ? (
+              <PlaylistColumn
+                title="Mainstream"
+                dotColor="#1DB954"
+                tracks={spotifyDeduped}
+                vibeProfile={vibeProfile}
+                showHeader={false}
+              />
+            ) : (
+              <PlaylistColumn
+                title="Underground"
+                dotColor="#CC0FE0"
+                tracks={audiusDeduped}
+                vibeProfile={vibeProfile}
+                isUnderground
+                showHeader={false}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* ── Vibe signature — collapsible ─────────────────────── */}
+        <div style={{ marginTop: '3rem', paddingBottom: '2rem' }}>
+          <button
+            onClick={() => setShowSignature((v) => !v)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.6rem 0',
+              background: 'none',
+              border: '1px solid var(--glass-border)',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              fontFamily: 'var(--font-geist-mono)',
+              fontSize: '0.62rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--glass-border-bright)'
+              e.currentTarget.style.color = 'var(--muse-text)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--glass-border)'
+              e.currentTarget.style.color = 'var(--text-muted)'
+            }}
+          >
+            {showSignature ? '↑ Hide Vibe Signature' : '✦ View Vibe Signature'}
+          </button>
+
+          <AnimatePresence>
+            {showSignature && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                style={{ overflow: 'hidden' }}
+              >
+                <div style={{ paddingTop: '2rem', display: 'flex', justifyContent: 'center' }}>
+                  <VibeSignature
+                    features={features}
+                    energyLevel={energyLevel}
+                    moodLabel={moodLabel}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Vibe Signature — open, no card wrapper */}
-        <div className="flex justify-center py-8">
-          <VibeSignature
-            features={features}
-            energyLevel={vibeProfile.energyLevel}
-            moodLabel={vibeProfile.moodLabel}
-          />
-        </div>
       </div>
     </div>
   )
