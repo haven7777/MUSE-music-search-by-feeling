@@ -68,9 +68,9 @@ export async function clearAllPlaylistsCloud(): Promise<void> {
 export async function addFavoriteTrackCloud(track: FavoriteTrack): Promise<void> {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  if (!user) { console.error('[cloudStorage] addFavoriteTrack: no user'); return }
 
-  await supabase.from('saved_songs').upsert({
+  const { error } = await supabase.from('saved_songs').upsert({
     id: track.id,
     user_id: user.id,
     title: track.title,
@@ -81,6 +81,7 @@ export async function addFavoriteTrackCloud(track: FavoriteTrack): Promise<void>
     mood_label: track.moodLabel,
     source: track.source,
   })
+  if (error) console.error('[cloudStorage] addFavoriteTrack error:', error)
 }
 
 export async function getFavoriteTracksCloud(): Promise<FavoriteTrack[]> {

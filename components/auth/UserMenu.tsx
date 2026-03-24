@@ -13,13 +13,13 @@ export function UserMenu() {
     return (
       <button
         onClick={() => void signOut()}
-        className="text-[0.75rem] font-mono uppercase tracking-widest transition-all hover:opacity-100 rounded-full"
+        className="text-[0.88rem] font-mono uppercase tracking-widest transition-all hover:opacity-100 inline-flex items-center gap-1 rounded-full"
         style={{
-          color: 'rgba(255,255,255,0.7)',
-          background: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          padding: '0.35rem 0.85rem',
-          fontWeight: 600,
+          color: 'rgba(255,255,255,0.9)',
+          background: 'rgba(255,255,255,0.1)',
+          border: '1px solid rgba(255,255,255,0.2)',
+          padding: '0.5rem 1.1rem',
+          fontWeight: 700,
           cursor: 'pointer',
         }}
       >
@@ -32,13 +32,13 @@ export function UserMenu() {
     <>
       <button
         onClick={() => setShowAuth(true)}
-        className="text-[0.75rem] font-mono uppercase tracking-widest transition-all hover:opacity-100 rounded-full"
+        className="text-[0.88rem] font-mono uppercase tracking-widest transition-all hover:opacity-100 inline-flex items-center gap-1 rounded-full"
         style={{
-          color: 'rgba(255,255,255,0.85)',
+          color: 'rgba(255,255,255,0.9)',
           background: 'rgba(255,255,255,0.1)',
-          border: '1px solid rgba(255,255,255,0.18)',
-          padding: '0.35rem 0.85rem',
-          fontWeight: 600,
+          border: '1px solid rgba(255,255,255,0.2)',
+          padding: '0.5rem 1.1rem',
+          fontWeight: 700,
           cursor: 'pointer',
         }}
       >

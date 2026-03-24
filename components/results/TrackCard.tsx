@@ -8,6 +8,7 @@ import { truncateTitle } from '@/lib/utils'
 import { useAudio } from '@/components/shared/AudioContext'
 import { addFavoriteTrackCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
 import { useAuth } from '@/components/auth/AuthContext'
+import { useToast } from '@/components/shared/Toast'
 import { FullPlayer } from './FullPlayer'
 import { MiniPlayer } from './MiniPlayer'
 
@@ -43,6 +44,7 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
 
   const [isSaved, setIsSaved] = useState(false)
   const { user } = useAuth()
+  const { showToast } = useToast()
 
   function stopProp(e: React.MouseEvent) { e.stopPropagation() }
 
@@ -50,10 +52,12 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
     e.stopPropagation()
     if (!user) return
     if (isSaved) {
-      void removeFavoriteTrackCloud(track.id)
-      setIsSaved(false)
+      removeFavoriteTrackCloud(track.id).then(() => {
+        setIsSaved(false)
+        showToast('Song removed', 'info')
+      })
     } else {
-      void addFavoriteTrackCloud({
+      addFavoriteTrackCloud({
         id: track.id,
         source,
         title: track.title,
@@ -63,8 +67,10 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
         moodLabel,
         spotifyUrl: spotifyTrack?.spotifyUrl,
         streamUrl: audiusTrack?.streamUrl,
+      }).then(() => {
+        setIsSaved(true)
+        showToast('Song saved ✓', 'success')
       })
-      setIsSaved(true)
     }
   }
 
