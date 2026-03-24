@@ -6,7 +6,8 @@ import { motion } from 'framer-motion'
 import { AudiusTrack, SpotifyTrackData, TrackCardProps } from '@/types'
 import { truncateTitle } from '@/lib/utils'
 import { useAudio } from '@/components/shared/AudioContext'
-import { isFavoriteTrack, addFavoriteTrack, removeFavoriteTrack } from '@/lib/storage'
+import { addFavoriteTrackCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
+import { useAuth } from '@/components/auth/AuthContext'
 import { FullPlayer } from './FullPlayer'
 import { MiniPlayer } from './MiniPlayer'
 
@@ -40,17 +41,19 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
   const displayTitle = truncateTitle(rawTitle)
   const isThisPlaying = currentTrackId === track.id && isPlaying
 
-  const [isSaved, setIsSaved] = useState(() => isFavoriteTrack(track.id))
+  const [isSaved, setIsSaved] = useState(false)
+  const { user } = useAuth()
 
   function stopProp(e: React.MouseEvent) { e.stopPropagation() }
 
   function toggleSaved(e: React.MouseEvent) {
     e.stopPropagation()
+    if (!user) return
     if (isSaved) {
-      removeFavoriteTrack(track.id)
+      void removeFavoriteTrackCloud(track.id)
       setIsSaved(false)
     } else {
-      addFavoriteTrack({
+      void addFavoriteTrackCloud({
         id: track.id,
         source,
         title: track.title,
