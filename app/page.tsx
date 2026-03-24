@@ -20,12 +20,13 @@ import { useAudio } from '@/components/shared/AudioContext'
 import { getPlaylistByIdCloud } from '@/lib/cloudStorage'
 
 function HomePageInner() {
-  const [phase, setPhase] = useState<AppPhase>('input')
+  const searchParams = useSearchParams()
+  const hasMomentParam = !!searchParams.get('moment')
+  const [phase, setPhase] = useState<AppPhase>(hasMomentParam ? 'processing' : 'input')
   const [lastInput, setLastInput] = useState('')
   const [processingKeywords, setProcessingKeywords] = useState<string[]>([])
   const [playlist, setPlaylist] = useState<MusePlaylist | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
-  const searchParams = useSearchParams()
   const didAutoSubmit = useRef(false)
   const { pause } = useAudio()
 
@@ -40,6 +41,8 @@ function HomePageInner() {
         if (saved) {
           setPlaylist(saved)
           setPhase('results')
+        } else {
+          setPhase('input')
         }
       })
       return
@@ -324,7 +327,7 @@ function HomePageInner() {
                   fontWeight: 600,
                 }}
               >
-                Moments
+                Saved Music &amp; Moments
               </Link>
             </div>
             <ResultsPage playlist={playlist} />

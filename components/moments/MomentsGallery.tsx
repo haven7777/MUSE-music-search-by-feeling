@@ -22,8 +22,8 @@ export function MomentsGallery() {
   useEffect(() => {
     if (authLoading) return
     if (!user) return
-    getPlaylistsCloud().then(setPlaylists)
-    getFavoriteTracksCloud().then(setSavedSongs)
+    getPlaylistsCloud().then((p) => { console.log('[MomentsGallery] playlists:', p.length); setPlaylists(p) })
+    getFavoriteTracksCloud().then((s) => { console.log('[MomentsGallery] savedSongs:', s.length, s); setSavedSongs(s) })
   }, [user, authLoading])
 
   function handleDelete(id: string) {

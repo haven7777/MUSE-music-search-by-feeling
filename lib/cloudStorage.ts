@@ -86,11 +86,12 @@ export async function addFavoriteTrackCloud(track: FavoriteTrack): Promise<void>
 
 export async function getFavoriteTracksCloud(): Promise<FavoriteTrack[]> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('saved_songs')
     .select('*')
     .order('created_at', { ascending: false })
 
+  if (error) console.error('[cloudStorage] getFavoriteTracks error:', error)
   if (!data) return []
 
   return data.map((row) => ({
