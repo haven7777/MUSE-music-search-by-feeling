@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Trash2, ExternalLink } from 'lucide-react'
 import { FavoriteTrack, MusePlaylist } from '@/types'
-import { clearAllPlaylists, deletePlaylist, getPlaylists, getFavoriteTracks, removeFavoriteTrack } from '@/lib/storage'
+import { clearAllPlaylistsCloud, deletePlaylistCloud, getPlaylistsCloud, getFavoriteTracksCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
 import { useToast } from '@/components/shared/Toast'
+import { useAuth } from '@/components/auth/AuthContext'
 import { MomentThumbnail } from './MomentThumbnail'
 
 export function MomentsGallery() {
@@ -14,22 +15,25 @@ export function MomentsGallery() {
   const [savedSongs, setSavedSongs] = useState<FavoriteTrack[]>([])
   const [showClearConfirm, setShowClearConfirm] = useState(false)
   const { showToast } = useToast()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const MAX = 50
 
   useEffect(() => {
-    setPlaylists(getPlaylists())
-    setSavedSongs(getFavoriteTracks())
-  }, [])
+    if (authLoading) return
+    if (!user) return
+    getPlaylistsCloud().then(setPlaylists)
+    getFavoriteTracksCloud().then(setSavedSongs)
+  }, [user, authLoading])
 
   function handleDelete(id: string) {
-    deletePlaylist(id)
+    void deletePlaylistCloud(id)
     setPlaylists((prev) => prev.filter((p) => p.id !== id))
     showToast('Moment deleted', 'info')
   }
 
   function handleClearAll() {
-    clearAllPlaylists()
+    void clearAllPlaylistsCloud()
     setPlaylists([])
     setShowClearConfirm(false)
     showToast('All moments cleared', 'info')
@@ -40,13 +44,40 @@ export function MomentsGallery() {
   }
 
   function handleRemoveSong(id: string) {
-    removeFavoriteTrack(id)
+    void removeFavoriteTrackCloud(id)
     setSavedSongs((prev) => prev.filter((s) => s.id !== id))
     showToast('Removed from saved songs', 'info')
   }
 
   const hasPlaylists = playlists.length > 0
   const hasSongs = savedSongs.length > 0
+
+  if (!authLoading && !user) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center gap-6">
+        <div style={{ fontSize: '3rem' }}>🔒</div>
+        <div>
+          <p style={{ fontFamily: 'var(--font-syne)', fontWeight: 600, fontSize: '1.2rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+            Sign in to see your moments
+          </p>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '280px', margin: '0 auto 1.5rem', lineHeight: 1.6 }}>
+            Your saved moments and songs live in the cloud — sign in to access them from any device.
+          </p>
+          <Link
+            href="/"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+              background: 'var(--muse-primary)', color: 'white', borderRadius: '50px',
+              padding: '0.65rem 1.5rem', fontSize: '0.85rem', fontWeight: 600,
+              boxShadow: '0 4px 20px var(--glow-primary-soft)',
+            }}
+          >
+            Back to MUSE →
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   if (!hasPlaylists && !hasSongs) {
     return (

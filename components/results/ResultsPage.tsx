@@ -5,8 +5,11 @@ import { Bookmark, Share2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MusePlaylist, RankedTrack } from '@/types'
 import { applyColorPalette } from '@/lib/colorSystem'
-import { savePlaylist, deletePlaylist, generateId } from '@/lib/storage'
+import { generateId } from '@/lib/storage'
+import { savePlaylistCloud, deletePlaylistCloud } from '@/lib/cloudStorage'
 import { useToast } from '@/components/shared/Toast'
+import { useAuth } from '@/components/auth/AuthContext'
+import { AuthModal } from '@/components/auth/AuthModal'
 import { PlaylistColumn } from './PlaylistColumn'
 import { TrackModal } from './TrackModal'
 
@@ -24,30 +27,35 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
   const [activeTab, setActiveTab] = useState<Tab>('mainstream')
   const [selectedTrack, setSelectedTrack] = useState<RankedTrack | null>(null)
   const [showSpotifyCTA, setShowSpotifyCTA] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const { showToast } = useToast()
+  const { user } = useAuth()
 
   useEffect(() => {
     applyColorPalette(colorPalette)
   }, [colorPalette])
 
-  function ensureSaved(): string {
-    if (savedId) return savedId
-    const id = generateId()
-    const toSave: MusePlaylist = { ...playlist, id, createdAt: Date.now() }
-    savePlaylist(toSave)
+  async function ensureSaved(): Promise<string> {
+    const id = savedId || generateId()
+    const toSave: MusePlaylist = { ...playlist, id, createdAt: playlist.createdAt || Date.now() }
+    await savePlaylistCloud(toSave)
     setSavedId(id)
     setIsSaved(true)
     return id
   }
 
-  function handleSave() {
+  async function handleSave() {
+    if (!user) {
+      setShowAuthModal(true)
+      return
+    }
     if (isSaved && savedId) {
-      deletePlaylist(savedId)
+      await deletePlaylistCloud(savedId)
       setSavedId('')
       setIsSaved(false)
       showToast('Moment removed', 'info')
     } else {
-      ensureSaved()
+      await ensureSaved()
       setIsSaved(true)
       showToast('Moment saved ✓', 'success')
     }
@@ -167,7 +175,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                 Share
               </button>
               <button
-                onClick={handleSave}
+                onClick={() => void handleSave()}
                 aria-label={isSaved ? 'Remove saved moment' : 'Save this moment'}
                 style={{
                   display: 'flex',
@@ -375,6 +383,11 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
 
       </div>
     </div>
+
+    {/* Auth modal */}
+    <AnimatePresence>
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+    </AnimatePresence>
 
     {/* Track modal */}
     <AnimatePresence>

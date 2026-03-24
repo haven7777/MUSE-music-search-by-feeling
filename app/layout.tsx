@@ -6,6 +6,7 @@ import { AudioProvider } from '@/components/shared/AudioContext'
 import { DynamicBackground } from '@/components/shared/DynamicBackground'
 import { ToastProvider } from '@/components/shared/Toast'
 import { NowPlayingBar } from '@/components/shared/NowPlayingBar'
+import { AuthProvider } from '@/components/auth/AuthContext'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -52,13 +53,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} antialiased`}>
-        <ToastProvider>
-          <AudioProvider>
-            <DynamicBackground />
-            {children}
-            <NowPlayingBar />
-          </AudioProvider>
-        </ToastProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <AudioProvider>
+              <DynamicBackground />
+              {children}
+              <NowPlayingBar />
+            </AudioProvider>
+          </ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   )
