@@ -9,6 +9,8 @@ import { useAudio } from '@/components/shared/AudioContext'
 import { addFavoriteTrackCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
 import { useAuth } from '@/components/auth/AuthContext'
 import { useToast } from '@/components/shared/Toast'
+import { AnimatePresence } from 'framer-motion'
+import { AuthModal } from '@/components/auth/AuthModal'
 import { FullPlayer } from './FullPlayer'
 import { MiniPlayer } from './MiniPlayer'
 
@@ -43,6 +45,7 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
   const isThisPlaying = currentTrackId === track.id && isPlaying
 
   const [isSaved, setIsSaved] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const { user } = useAuth()
   const { showToast } = useToast()
 
@@ -50,7 +53,10 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
 
   function toggleSaved(e: React.MouseEvent) {
     e.stopPropagation()
-    if (!user) return
+    if (!user) {
+      setShowAuthModal(true)
+      return
+    }
     if (isSaved) {
       removeFavoriteTrackCloud(track.id).then(() => {
         setIsSaved(false)
@@ -67,6 +73,7 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
         moodLabel,
         spotifyUrl: spotifyTrack?.spotifyUrl,
         streamUrl: audiusTrack?.streamUrl,
+        previewUrl: spotifyTrack?.itunesPreviewUrl ?? undefined,
       }).then(() => {
         setIsSaved(true)
         showToast('Song saved ✓', 'success')
@@ -111,7 +118,7 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
         />
       )}
 
-      {/* Bookmark button — top-right, visible on hover or when saved */}
+      {/* Bookmark button — top-right, always visible */}
       <button
         onClick={toggleSaved}
         aria-label={isSaved ? 'Remove from saved songs' : 'Save this song'}
@@ -120,18 +127,17 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
           top: '8px',
           right: '8px',
           zIndex: 2,
-          background: 'none',
+          background: isSaved ? 'rgba(var(--muse-primary-rgb), 0.15)' : 'rgba(0,0,0,0.4)',
           border: 'none',
           cursor: 'pointer',
-          padding: '4px',
-          borderRadius: '6px',
-          color: isSaved ? 'var(--muse-primary)' : 'rgba(255,255,255,0.5)',
-          opacity: isSaved ? 1 : 0,
-          transition: 'opacity 0.15s ease, color 0.15s ease',
+          padding: '6px',
+          borderRadius: '8px',
+          color: isSaved ? 'var(--muse-primary)' : 'rgba(255,255,255,0.7)',
+          transition: 'all 0.15s ease',
         }}
-        className="group-hover:opacity-100"
+        className="hover:scale-110"
       >
-        <Bookmark size={14} fill={isSaved ? 'currentColor' : 'none'} />
+        <Bookmark size={16} fill={isSaved ? 'currentColor' : 'none'} />
       </button>
 
       <div style={{ padding: '1rem' }}>
@@ -203,6 +209,9 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
           Tap for AI analysis &amp; details →
         </p>
       </div>
+      <AnimatePresence>
+        {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      </AnimatePresence>
     </motion.div>
   )
 }

@@ -80,6 +80,7 @@ export async function addFavoriteTrackCloud(track: FavoriteTrack): Promise<void>
     audius_url: track.streamUrl,
     mood_label: track.moodLabel,
     source: track.source,
+    preview_url: track.previewUrl,
   })
   if (error) console.error('[cloudStorage] addFavoriteTrack error:', error)
 }
@@ -104,6 +105,7 @@ export async function getFavoriteTracksCloud(): Promise<FavoriteTrack[]> {
     moodLabel: row.mood_label as string | undefined,
     spotifyUrl: row.spotify_url as string | undefined,
     streamUrl: row.audius_url as string | undefined,
+    previewUrl: row.preview_url as string | undefined,
   }))
 }
 

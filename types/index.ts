@@ -86,6 +86,7 @@ export interface FavoriteTrack {
   moodLabel?: string
   spotifyUrl?: string
   streamUrl?: string
+  previewUrl?: string
 }
 
 export interface MusePlaylist {

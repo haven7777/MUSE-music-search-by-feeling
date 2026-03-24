@@ -8,6 +8,8 @@ import { FavoriteTrack, MusePlaylist } from '@/types'
 import { clearAllPlaylistsCloud, deletePlaylistCloud, getPlaylistsCloud, getFavoriteTracksCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
 import { useToast } from '@/components/shared/Toast'
 import { useAuth } from '@/components/auth/AuthContext'
+import { MiniPlayer } from '@/components/results/MiniPlayer'
+import { FullPlayer } from '@/components/results/FullPlayer'
 import { MomentThumbnail } from './MomentThumbnail'
 
 export function MomentsGallery() {
@@ -22,8 +24,8 @@ export function MomentsGallery() {
   useEffect(() => {
     if (authLoading) return
     if (!user) return
-    getPlaylistsCloud().then((p) => { console.log('[MomentsGallery] playlists:', p.length); setPlaylists(p) })
-    getFavoriteTracksCloud().then((s) => { console.log('[MomentsGallery] savedSongs:', s.length, s); setSavedSongs(s) })
+    getPlaylistsCloud().then((p) => setPlaylists(p))
+    getFavoriteTracksCloud().then((s) => setSavedSongs(s))
   }, [user, authLoading])
 
   function handleDelete(id: string) {
@@ -227,45 +229,57 @@ export function MomentsGallery() {
                   )}
                 </div>
 
-                {/* Info */}
+                {/* Info + Player */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--muse-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {song.title}
-                  </p>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {song.artist}
-                  </p>
-                  {song.moodLabel && (
-                    <p style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                      {song.moodLabel}
-                    </p>
-                  )}
-                </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--muse-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {song.title}
+                      </p>
+                      <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {song.artist}
+                      </p>
+                      {song.moodLabel && (
+                        <p style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                          {song.moodLabel}
+                        </p>
+                      )}
+                    </div>
 
-                {/* Actions */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
-                  {song.spotifyUrl && (
-                    <a
-                      href={song.spotifyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Open in Spotify"
-                      title="Open in Spotify"
-                      style={{ padding: '6px', borderRadius: '6px', color: '#1DB954', display: 'flex' }}
-                      className="hover:bg-white/10 transition-colors"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                    {/* Actions */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
+                      {song.spotifyUrl && (
+                        <a
+                          href={song.spotifyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Open in Spotify"
+                          title="Open in Spotify"
+                          style={{ padding: '6px', borderRadius: '6px', color: '#1DB954', display: 'flex' }}
+                          className="hover:bg-white/10 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      <button
+                        onClick={() => handleRemoveSong(song.id)}
+                        aria-label="Remove from saved songs"
+                        title="Remove"
+                        style={{ padding: '6px', borderRadius: '6px', color: 'var(--text-muted)', display: 'flex', background: 'none', border: 'none', cursor: 'pointer' }}
+                        className="hover:bg-white/10 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Preview player */}
+                  {song.source === 'spotify' && song.previewUrl && (
+                    <MiniPlayer previewUrl={song.previewUrl} trackId={song.id} title={song.title} />
                   )}
-                  <button
-                    onClick={() => handleRemoveSong(song.id)}
-                    aria-label="Remove from saved songs"
-                    title="Remove"
-                    style={{ padding: '6px', borderRadius: '6px', color: 'var(--text-muted)', display: 'flex', background: 'none', border: 'none', cursor: 'pointer' }}
-                    className="hover:bg-white/10 transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  {song.source === 'audius' && song.streamUrl && (
+                    <FullPlayer streamUrl={song.streamUrl} trackId={song.id} title={song.title} durationMs={0} />
+                  )}
                 </div>
               </div>
             ))}

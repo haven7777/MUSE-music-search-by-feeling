@@ -26,6 +26,7 @@ create table public.saved_songs (
   audius_url text,
   mood_label text,
   source text,
+  preview_url text,
   created_at timestamptz default now() not null
 );
 

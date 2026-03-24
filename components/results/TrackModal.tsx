@@ -1,11 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { X, Heart, ExternalLink, Sparkles, Music } from 'lucide-react'
+import { X, ExternalLink, Sparkles, Music } from 'lucide-react'
 import { RankedTrack, SpotifyTrackData, AudiusTrack, VibeProfile } from '@/types'
-import { isFavoriteTrack, addFavoriteTrack, removeFavoriteTrack } from '@/lib/storage'
-import { useToast } from '@/components/shared/Toast'
 import { MiniPlayer } from './MiniPlayer'
 import { FullPlayer } from './FullPlayer'
 
@@ -43,10 +41,6 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
   const isSpotify = source === 'spotify'
   const spotifyTrack = isSpotify ? (track as SpotifyTrackData) : null
   const audiusTrack = !isSpotify ? (track as AudiusTrack) : null
-  const { showToast } = useToast()
-
-  const [isFav, setIsFav] = useState(() => isFavoriteTrack(track.id))
-
   const keywords = [vibeProfile.moodLabel, vibeProfile.emotionalCore, ...vibeProfile.sonicTexture]
     .slice(0, 6)
     .map((k) => k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
@@ -64,27 +58,6 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
-
-  function toggleFavorite() {
-    if (isFav) {
-      removeFavoriteTrack(track.id)
-      setIsFav(false)
-      showToast('Removed from favorites', 'success')
-    } else {
-      addFavoriteTrack({
-        id: track.id,
-        source,
-        title: track.title,
-        artist: track.artist,
-        coverArt: track.coverArt ?? '',
-        savedAt: Date.now(),
-        spotifyUrl: spotifyTrack?.spotifyUrl,
-        streamUrl: audiusTrack?.streamUrl,
-      })
-      setIsFav(true)
-      showToast('Added to favorites ♥', 'success')
-    }
-  }
 
   const af = spotifyTrack?.audioFeatures
 
@@ -130,8 +103,8 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
           <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.2)' }} />
         </div>
 
-        {/* Top bar: close + favorite */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem' }}>
+        {/* Top bar: close */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.75rem' }}>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -143,28 +116,6 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
             }}
           >
             <X size={16} />
-          </button>
-
-          <button
-            onClick={toggleFavorite}
-            aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '0.4rem',
-              padding: '0.5rem 1rem', borderRadius: '50px',
-              background: isFav ? 'var(--muse-primary)' : 'var(--glass-1)',
-              border: `1px solid ${isFav ? 'var(--muse-primary)' : 'var(--glass-border)'}`,
-              cursor: 'pointer',
-              color: isFav ? 'white' : 'var(--text-secondary)',
-              fontFamily: 'var(--font-geist-mono)',
-              fontSize: '0.72rem',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <Heart size={13} fill={isFav ? 'currentColor' : 'none'} />
-            {isFav ? 'Saved' : 'Save'}
           </button>
         </div>
 
