@@ -97,7 +97,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
   return (
     <>
     <div className="min-h-screen pb-20">
-      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 1.5rem' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 1rem' }} className="sm:!px-6">
 
         {/* ── Compact hero header ──────────────────────────────── */}
         <motion.section
@@ -161,7 +161,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.4rem',
-                  padding: '0.4rem 0.9rem',
+                  padding: '0.5rem 0.9rem',
                   borderRadius: '50px',
                   background: 'rgba(255,255,255,0.1)',
                   border: '1px solid rgba(255,255,255,0.22)',
@@ -192,7 +192,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.4rem',
-                  padding: '0.4rem 0.9rem',
+                  padding: '0.5rem 0.9rem',
                   borderRadius: '50px',
                   background: isSaved ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
                   border: `1px solid ${isSaved ? 'var(--muse-primary)' : 'rgba(255,255,255,0.22)'}`,

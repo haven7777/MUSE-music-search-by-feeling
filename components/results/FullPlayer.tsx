@@ -53,8 +53,8 @@ export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayer
         aria-label={isThisPlaying ? `Pause ${title}` : `Play ${title}`}
         className="flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-95"
         style={{
-          width: '26px',
-          height: '26px',
+          width: '34px',
+          height: '34px',
           borderRadius: '50%',
           background: 'var(--muse-primary)',
           boxShadow: isThisPlaying
@@ -66,9 +66,9 @@ export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayer
         }}
       >
         {isThisPlaying ? (
-          <Pause style={{ width: '10px', height: '10px', color: 'white', fill: 'white' }} />
+          <Pause style={{ width: '12px', height: '12px', color: 'white', fill: 'white' }} />
         ) : (
-          <Play style={{ width: '10px', height: '10px', color: 'white', fill: 'white' }} />
+          <Play style={{ width: '12px', height: '12px', color: 'white', fill: 'white' }} />
         )}
       </button>
 
@@ -87,11 +87,13 @@ export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayer
         aria-valuenow={Math.round(displayProgress * 100)}
         aria-label={`${title} progress — use arrow keys to seek`}
         style={{
-          height: '4px',
+          height: '6px',
           background: 'rgba(255,255,255,0.1)',
-          borderRadius: '2px',
+          borderRadius: '3px',
           cursor: 'pointer',
           overflow: 'hidden',
+          padding: '8px 0',
+          backgroundClip: 'content-box',
         }}
       >
         <div

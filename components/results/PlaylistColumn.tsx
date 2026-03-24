@@ -130,6 +130,7 @@ export function PlaylistColumn({ title, dotColor, tracks, vibeProfile, isLoading
       )}
 
       <div
+        className="track-grid-mobile"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',

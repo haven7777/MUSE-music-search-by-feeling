@@ -34,8 +34,8 @@ export function MiniPlayer({ previewUrl, trackId, title }: MiniPlayerProps) {
         aria-label={isThisPlaying ? `Pause ${title}` : `Play ${title}`}
         className="flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-95"
         style={{
-          width: '26px',
-          height: '26px',
+          width: '34px',
+          height: '34px',
           borderRadius: '50%',
           background: 'var(--muse-primary)',
           boxShadow: isThisPlaying
@@ -47,9 +47,9 @@ export function MiniPlayer({ previewUrl, trackId, title }: MiniPlayerProps) {
         }}
       >
         {isThisPlaying ? (
-          <Pause style={{ width: '10px', height: '10px', color: 'white', fill: 'white' }} />
+          <Pause style={{ width: '12px', height: '12px', color: 'white', fill: 'white' }} />
         ) : (
-          <Play style={{ width: '10px', height: '10px', color: 'white', fill: 'white' }} />
+          <Play style={{ width: '12px', height: '12px', color: 'white', fill: 'white' }} />
         )}
       </button>
 

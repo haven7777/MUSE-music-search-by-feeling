@@ -291,7 +291,7 @@ function HomePageInner() {
             className="flex-1"
           >
             <div
-              className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 border-b"
+              className="sticky top-0 z-20 flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3 border-b"
               style={{
                 background: 'rgba(4,4,10,0.85)',
                 backdropFilter: 'blur(20px)',
@@ -300,34 +300,34 @@ function HomePageInner() {
             >
               <button
                 onClick={handleReset}
-                className="text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
+                className="text-[0.7rem] sm:text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
                   color: 'rgba(255,255,255,0.85)',
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.15)',
-                  padding: '0.35rem 0.75rem',
+                  padding: '0.4rem 0.6rem',
                   fontWeight: 600,
                 }}
               >
-                ← New Feeling
+                ← New
               </button>
               <span className="text-sm font-bold gradient-text" style={{ fontFamily: 'var(--font-syne)' }}>
                 MUSE
               </span>
               <Link
                 href="/moments"
-                className="text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
+                className="text-[0.7rem] sm:text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
                   color: 'rgba(255,255,255,0.85)',
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.15)',
-                  padding: '0.35rem 0.75rem',
+                  padding: '0.4rem 0.6rem',
                   fontWeight: 600,
                 }}
               >
-                Saved Music &amp; Moments
+                Saved ♫
               </Link>
             </div>
             <ResultsPage playlist={playlist} />

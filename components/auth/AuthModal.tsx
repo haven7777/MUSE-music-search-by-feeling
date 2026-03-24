@@ -57,9 +57,9 @@ export function AuthModal({ onClose }: AuthModalProps) {
           background: '#08080f',
           border: '1px solid rgba(255,255,255,0.12)',
           borderRadius: '20px',
-          padding: '2rem',
+          padding: '1.5rem',
           maxWidth: '380px',
-          width: '100%',
+          width: 'calc(100% - 2rem)',
           position: 'relative',
         }}
       >

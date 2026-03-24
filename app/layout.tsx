@@ -26,6 +26,13 @@ const syne = Syne({
   weight: ['400', '700', '800'],
 })
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#080810',
+}
+
 export const metadata: Metadata = {
   title: 'MUSE — Describe a feeling. Discover its soundtrack.',
   description:
@@ -46,7 +53,6 @@ export const metadata: Metadata = {
   icons: {
     apple: '/apple-touch-icon.png',
   },
-  themeColor: '#080810',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

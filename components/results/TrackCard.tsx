@@ -124,13 +124,13 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
         aria-label={isSaved ? 'Remove from saved songs' : 'Save this song'}
         style={{
           position: 'absolute',
-          top: '8px',
-          right: '8px',
+          top: '6px',
+          right: '6px',
           zIndex: 2,
           background: isSaved ? 'rgba(var(--muse-primary-rgb), 0.15)' : 'rgba(0,0,0,0.4)',
           border: 'none',
           cursor: 'pointer',
-          padding: '6px',
+          padding: '8px',
           borderRadius: '8px',
           color: isSaved ? 'var(--muse-primary)' : 'rgba(255,255,255,0.7)',
           transition: 'all 0.15s ease',

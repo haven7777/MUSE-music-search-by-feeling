@@ -108,9 +108,9 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
             </p>
           </div>
 
-          {/* Actions — show on group-hover */}
+          {/* Actions — always visible on mobile, hover on desktop */}
           <div
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
             style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}
           >
             <button
@@ -120,9 +120,9 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
               }}
               aria-label="Re-explore this feeling"
               title="Re-explore"
-              className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-2.5 sm:p-1.5 rounded-lg hover:bg-white/10 transition-colors"
             >
-              <RotateCcw className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
+              <RotateCcw className="w-4 h-4 sm:w-3.5 sm:h-3.5" style={{ color: 'var(--text-muted)' }} />
             </button>
             <button
               onClick={(e) => {
@@ -131,9 +131,9 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
               }}
               aria-label="Delete this moment"
               title="Delete"
-              className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-2.5 sm:p-1.5 rounded-lg hover:bg-white/10 transition-colors"
             >
-              <Trash2 className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
+              <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" style={{ color: 'var(--text-muted)' }} />
             </button>
           </div>
         </div>

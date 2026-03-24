@@ -189,17 +189,17 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
       </motion.div>
 
       {/* Pill submit button — always visible below the textarea */}
-      <div className="flex justify-center items-center gap-3" style={{ marginTop: '1rem' }}>
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-3" style={{ marginTop: '1rem' }}>
         <button
           type="submit"
           disabled={!canSubmit}
-          className="transition-all focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="transition-all focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent w-full sm:w-auto"
           style={{
             background: 'var(--muse-primary)',
             borderRadius: '50px',
-            padding: '0.65rem 1.75rem',
+            padding: '0.75rem 1.75rem',
             fontWeight: 600,
-            fontSize: '0.9rem',
+            fontSize: '0.95rem',
             letterSpacing: '0.02em',
             color: 'white',
             boxShadow: canSubmit ? '0 4px 24px var(--glow-primary-soft)' : 'none',
@@ -208,34 +208,22 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
             opacity: canSubmit ? 1 : 0.4,
             transition: 'opacity 0.2s ease, box-shadow 0.2s ease',
           }}
-          onMouseEnter={(e) => {
-            if (!canSubmit) return
-            ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
-            ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 32px var(--glow-primary-soft)'
-          }}
-          onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
-            ;(e.currentTarget as HTMLButtonElement).style.boxShadow = canSubmit ? '0 4px 24px var(--glow-primary-soft)' : 'none'
-          }}
-          onMouseDown={(e) => {
-            if (!canSubmit) return
-            ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
-          }}
         >
           {isLoading ? 'Finding…' : 'Feel the music →'}
         </button>
         <Link
           href="/moments"
-          className="transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full"
+          className="transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full w-full sm:w-auto text-center"
           style={{
             fontFamily: 'var(--font-geist-mono)',
-            fontSize: '0.82rem',
+            fontSize: '0.85rem',
             fontWeight: 600,
             color: 'rgba(255,255,255,0.85)',
             background: 'rgba(255,255,255,0.1)',
             border: '1px solid rgba(255,255,255,0.18)',
-            padding: '0.65rem 1.1rem',
+            padding: '0.75rem 1.1rem',
             whiteSpace: 'nowrap',
+            display: 'block',
           }}
         >
           Saved Music &amp; Moments
