@@ -17,7 +17,7 @@ import { MoodChips } from '@/components/home/MoodChips'
 import { ProcessingState } from '@/components/home/ProcessingState'
 import { ResultsPage } from '@/components/results/ResultsPage'
 import { useAudio } from '@/components/shared/AudioContext'
-import { getPlaylistById } from '@/lib/storage'
+import { getPlaylistByIdCloud } from '@/lib/cloudStorage'
 
 function HomePageInner() {
   const [phase, setPhase] = useState<AppPhase>('input')
@@ -36,12 +36,13 @@ function HomePageInner() {
     // Load a saved moment by ID
     const momentId = searchParams.get('moment')
     if (momentId) {
-      const saved = getPlaylistById(momentId)
-      if (saved) {
-        setPlaylist(saved)
-        setPhase('results')
-        return
-      }
+      getPlaylistByIdCloud(momentId).then((saved) => {
+        if (saved) {
+          setPlaylist(saved)
+          setPhase('results')
+        }
+      })
+      return
     }
 
     // Re-run a search from ?q= param

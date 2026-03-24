@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MusePlaylist, RankedTrack } from '@/types'
 import { applyColorPalette } from '@/lib/colorSystem'
 import { generateId } from '@/lib/storage'
-import { savePlaylistCloud, deletePlaylistCloud } from '@/lib/cloudStorage'
+import { savePlaylistCloud, deletePlaylistCloud, getPlaylistByIdCloud } from '@/lib/cloudStorage'
 import { useToast } from '@/components/shared/Toast'
 import { useAuth } from '@/components/auth/AuthContext'
 import { AuthModal } from '@/components/auth/AuthModal'
@@ -22,7 +22,7 @@ type Tab = 'mainstream' | 'underground'
 export function ResultsPage({ playlist }: ResultsPageProps) {
   const { originalInput, vibeProfile, tracks } = playlist
   const { moodLabel, emotionalCore, sonicTexture, colorPalette } = vibeProfile
-  const [isSaved, setIsSaved] = useState(false)
+  const [isSaved, setIsSaved] = useState(!!playlist.id)
   const [savedId, setSavedId] = useState(playlist.id || '')
   const [activeTab, setActiveTab] = useState<Tab>('mainstream')
   const [selectedTrack, setSelectedTrack] = useState<RankedTrack | null>(null)
@@ -34,6 +34,17 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
   useEffect(() => {
     applyColorPalette(colorPalette)
   }, [colorPalette])
+
+  // Check if this playlist is already saved in cloud
+  useEffect(() => {
+    if (!playlist.id) return
+    getPlaylistByIdCloud(playlist.id).then((found) => {
+      if (found) {
+        setIsSaved(true)
+        setSavedId(playlist.id)
+      }
+    })
+  }, [playlist.id])
 
   async function ensureSaved(): Promise<string> {
     const id = savedId || generateId()

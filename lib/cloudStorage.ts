@@ -77,7 +77,7 @@ export async function addFavoriteTrackCloud(track: FavoriteTrack): Promise<void>
     artist: track.artist,
     cover_art: track.coverArt,
     spotify_url: track.spotifyUrl,
-    stream_url: track.streamUrl,
+    audius_url: track.streamUrl,
     mood_label: track.moodLabel,
     source: track.source,
   })
@@ -101,7 +101,7 @@ export async function getFavoriteTracksCloud(): Promise<FavoriteTrack[]> {
     savedAt: new Date(row.created_at as string).getTime(),
     moodLabel: row.mood_label as string | undefined,
     spotifyUrl: row.spotify_url as string | undefined,
-    streamUrl: row.stream_url as string | undefined,
+    streamUrl: row.audius_url as string | undefined,
   }))
 }
 
