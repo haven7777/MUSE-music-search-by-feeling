@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Send } from 'lucide-react'
+import { Mic, Send } from 'lucide-react'
 import { motion, useAnimation } from 'framer-motion'
 import Link from 'next/link'
 import { TypewriterPlaceholder } from './TypewriterPlaceholder'
@@ -16,8 +16,10 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
   const [focused, setFocused] = useState(false)
   const [showHint, setShowHint] = useState(false)
   const [showValidationMsg, setShowValidationMsg] = useState(false)
+  const [isListening, setIsListening] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
   const controls = useAnimation()
 
   // Show "Press Enter" hint after 1.5s of no typing activity
@@ -66,6 +68,49 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
       el.style.height = 'auto'
       el.style.height = `${el.scrollHeight}px`
     }
+  }
+
+  const SpeechRecognitionAPI = typeof window !== 'undefined'
+    ? (window.SpeechRecognition || window.webkitSpeechRecognition)
+    : null
+
+  function toggleVoice() {
+    if (isListening) {
+      recognitionRef.current?.stop()
+      setIsListening(false)
+      return
+    }
+
+    if (!SpeechRecognitionAPI) return
+
+    const recognition = new SpeechRecognitionAPI()
+    recognition.lang = 'en-US'
+    recognition.interimResults = true
+    recognition.continuous = false
+
+    const baseText = value
+
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let transcript = ''
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript
+      }
+      const newValue = baseText ? `${baseText} ${transcript}` : transcript
+      setValue(newValue)
+      // Auto-resize textarea
+      const el = textareaRef.current
+      if (el) {
+        el.style.height = 'auto'
+        el.style.height = `${el.scrollHeight}px`
+      }
+    }
+
+    recognition.onend = () => setIsListening(false)
+    recognition.onerror = () => setIsListening(false)
+
+    recognition.start()
+    recognitionRef.current = recognition
+    setIsListening(true)
   }
 
   const canSubmit = value.trim().length >= 3 && !isLoading
@@ -169,22 +214,41 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
             )}
           </div>
 
-          {/* Icon-only submit for mobile */}
-          <button
-            type="submit"
-            disabled={!canSubmit}
-            aria-hidden="true"
-            tabIndex={-1}
-            aria-label="Find my soundtrack"
-            className="flex items-center justify-center w-11 h-11 rounded-full transition-all hover:scale-105 active:scale-95 sm:hidden"
-            style={{
-              background: canSubmit ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
-              color: canSubmit ? 'white' : 'rgba(255,255,255,0.3)',
-              opacity: canSubmit ? 1 : 0.5,
-            }}
-          >
-            <Send className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Mic button */}
+            {SpeechRecognitionAPI && (
+              <button
+                type="button"
+                onClick={toggleVoice}
+                aria-label={isListening ? 'Stop listening' : 'Voice input'}
+                className={`flex items-center justify-center w-11 h-11 rounded-full transition-all active:scale-95 ${isListening ? 'voice-pulse' : ''}`}
+                style={{
+                  background: isListening ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
+                  color: isListening ? 'white' : 'rgba(255,255,255,0.5)',
+                  border: isListening ? '1px solid var(--muse-primary)' : '1px solid rgba(255,255,255,0.12)',
+                }}
+              >
+                <Mic className="w-4 h-4" />
+              </button>
+            )}
+
+            {/* Icon-only submit for mobile */}
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              aria-hidden="true"
+              tabIndex={-1}
+              aria-label="Find my soundtrack"
+              className="flex items-center justify-center w-11 h-11 rounded-full transition-all hover:scale-105 active:scale-95 sm:hidden"
+              style={{
+                background: canSubmit ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
+                color: canSubmit ? 'white' : 'rgba(255,255,255,0.3)',
+                opacity: canSubmit ? 1 : 0.5,
+              }}
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </motion.div>
 
