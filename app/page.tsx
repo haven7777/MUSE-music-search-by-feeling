@@ -171,8 +171,14 @@ function HomePageInner() {
       })
       setPhase('results')
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong'
-      setErrorMessage(message)
+      const raw = err instanceof Error ? err.message : 'Something went wrong'
+      // Map technical errors to friendly messages
+      const friendly = raw.includes('429') || raw.toLowerCase().includes('too many')
+        ? "You're moving fast! Give it a moment and try again."
+        : raw.includes('fetch') || raw.includes('network') || raw.toLowerCase().includes('failed')
+        ? "Couldn't reach the music servers. Check your connection and try again."
+        : "Something didn't click this time. Try rephrasing your feeling."
+      setErrorMessage(friendly)
       setPhase('error')
     }
   }

@@ -72,10 +72,25 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
     }
   }
 
-  function handleShare() {
-    void navigator.clipboard.writeText(window.location.href).then(() => {
-      showToast('Link copied to clipboard ✓', 'success')
-    })
+  async function handleShare() {
+    const url = window.location.href
+    const shareData = {
+      title: `MUSE — ${vibeProfile.moodLabel}`,
+      text: `Check out this vibe: "${originalInput}"`,
+      url,
+    }
+
+    if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+      try {
+        await navigator.share(shareData)
+        return
+      } catch {
+        // User cancelled or share failed — fall through to clipboard
+      }
+    }
+
+    await navigator.clipboard.writeText(url)
+    showToast('Link copied to clipboard ✓', 'success')
   }
 
   // Dedup + split
