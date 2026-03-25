@@ -46,8 +46,9 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
     .map((k) => k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
     .filter(Boolean)
 
-  const dragY = useMotionValue(0)
-  const backdropOpacity = useTransform(dragY, [0, 300], [1, 0])
+  // Track drag offset separately from the mount animation to avoid conflicts
+  const dragOffset = useMotionValue(0)
+  const backdropOpacity = useTransform(dragOffset, [0, 300], [1, 0])
   const sheetRef = useRef<HTMLDivElement>(null)
   const [dismissing, setDismissing] = useState(false)
   const canClose = useRef(false)
@@ -66,14 +67,16 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
 
+  function handleDrag(_: unknown, info: PanInfo) {
+    dragOffset.set(Math.max(0, info.offset.y))
+  }
+
   function handleDragEnd(_: unknown, info: PanInfo) {
     if (info.offset.y > 100 || info.velocity.y > 500) {
       setDismissing(true)
       setTimeout(onClose, 300)
-    } else {
-      // Snap back — reset dragY to 0
-      dragY.set(0)
     }
+    dragOffset.set(0)
   }
 
   const af = spotifyTrack?.audioFeatures
@@ -105,10 +108,10 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
         exit={{ y: '100%' }}
         transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
         drag="y"
-        dragConstraints={{ top: 0 }}
-        dragElastic={0.2}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.5 }}
+        onDrag={handleDrag}
         onDragEnd={handleDragEnd}
-        style={{ y: dragY }}
         onClick={(e) => e.stopPropagation()}
         className="track-modal-sheet"
       >
