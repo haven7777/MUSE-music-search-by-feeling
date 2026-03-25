@@ -10,12 +10,14 @@ import { useToast } from '@/components/shared/Toast'
 import { useAuth } from '@/components/auth/AuthContext'
 import { MiniPlayer } from '@/components/results/MiniPlayer'
 import { FullPlayer } from '@/components/results/FullPlayer'
+import { MomentCardSkeleton, SavedSongSkeleton } from '@/components/shared/LoadingSkeleton'
 import { MomentThumbnail } from './MomentThumbnail'
 
 export function MomentsGallery() {
   const [playlists, setPlaylists] = useState<MusePlaylist[]>([])
   const [savedSongs, setSavedSongs] = useState<FavoriteTrack[]>([])
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [dataLoading, setDataLoading] = useState(true)
   const { showToast } = useToast()
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
@@ -23,9 +25,12 @@ export function MomentsGallery() {
 
   useEffect(() => {
     if (authLoading) return
-    if (!user) return
-    getPlaylistsCloud().then((p) => setPlaylists(p))
-    getFavoriteTracksCloud().then((s) => setSavedSongs(s))
+    if (!user) { setDataLoading(false); return }
+    setDataLoading(true)
+    Promise.all([
+      getPlaylistsCloud().then((p) => setPlaylists(p)),
+      getFavoriteTracksCloud().then((s) => setSavedSongs(s)),
+    ]).finally(() => setDataLoading(false))
   }, [user, authLoading])
 
   function handleDelete(id: string) {
@@ -53,6 +58,30 @@ export function MomentsGallery() {
 
   const hasPlaylists = playlists.length > 0
   const hasSongs = savedSongs.length > 0
+
+  if (authLoading || (user && dataLoading)) {
+    return (
+      <div>
+        <section style={{ marginBottom: '3rem' }}>
+          <div className="flex items-center justify-between mb-6">
+            <div className="skeleton-block" style={{ height: '16px', width: '140px' }} />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 3 }).map((_, i) => <MomentCardSkeleton key={i} />)}
+          </div>
+        </section>
+        <section>
+          <div className="flex items-center gap-3 mb-5">
+            <div className="skeleton-block" style={{ width: '3px', height: '22px', borderRadius: '2px' }} />
+            <div className="skeleton-block" style={{ height: '16px', width: '110px' }} />
+          </div>
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 3 }).map((_, i) => <SavedSongSkeleton key={i} />)}
+          </div>
+        </section>
+      </div>
+    )
+  }
 
   if (!authLoading && !user) {
     return (

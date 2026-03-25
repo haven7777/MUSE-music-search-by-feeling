@@ -30,98 +30,58 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
+      className="group moment-card relative rounded-2xl overflow-hidden cursor-pointer transition-[transform,border-color,box-shadow] duration-200"
       style={{
-        position: 'relative',
-        borderRadius: '16px',
-        overflow: 'hidden',
         background: 'var(--depth-2)',
         border: '1px solid var(--glass-border)',
-        cursor: 'pointer',
-        transition: 'transform 0.2s, border-color 0.2s, box-shadow 0.2s',
       }}
       onClick={handleClick}
       role="button"
       tabIndex={0}
       aria-label={`View ${moodLabel} playlist`}
       onKeyDown={(e) => e.key === 'Enter' && handleClick()}
-      className="group moment-card"
-      whileHover={{
-        y: -2,
-        transition: { duration: 0.2 },
-      }}
+      whileHover={{ y: -2, transition: { duration: 0.2 } }}
     >
       {/* Left vertical gradient strip */}
       <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: '4px',
-          background: `linear-gradient(180deg, ${colorPalette.primary}, ${colorPalette.secondary})`,
-        }}
+        className="absolute left-0 top-0 bottom-0 w-1"
+        style={{ background: `linear-gradient(180deg, ${colorPalette.primary}, ${colorPalette.secondary})` }}
       />
 
-      {/* Content area — extra left padding to clear the strip */}
-      <div style={{ padding: '1rem 1rem 1rem 1.25rem' }}>
+      {/* Content area */}
+      <div className="p-4 pl-5">
         {/* Top row */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
-          {/* Left side */}
-          <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
             <p
-              style={{
-                fontFamily: 'var(--font-syne)',
-                fontWeight: 700,
-                fontSize: '0.95rem',
-                color: colorPalette.primary,
-                marginBottom: '0.35rem',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
+              className="font-bold text-[0.95rem] mb-1 truncate"
+              style={{ fontFamily: 'var(--font-syne)', color: colorPalette.primary }}
             >
               {moodLabel}
             </p>
             <p
-              style={{
-                fontSize: '0.78rem',
-                fontStyle: 'italic',
-                lineHeight: 1.55,
-                color: 'var(--text-secondary)',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
+              className="text-[0.78rem] italic line-clamp-2"
+              style={{ color: 'var(--text-secondary)', lineHeight: 1.55 }}
             >
               &ldquo;{originalInput}&rdquo;
             </p>
           </div>
 
           {/* Actions — always visible on mobile, hover on desktop */}
-          <div
-            className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}
-          >
+          <div className="flex items-center gap-1 flex-shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onReexplore(originalInput)
-              }}
+              onClick={(e) => { e.stopPropagation(); onReexplore(originalInput) }}
               aria-label="Re-explore this feeling"
               title="Re-explore"
-              className="p-2.5 sm:p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-2.5 sm:p-1.5 rounded-lg hover:bg-white/10 active:bg-white/15 transition-colors"
             >
               <RotateCcw className="w-4 h-4 sm:w-3.5 sm:h-3.5" style={{ color: 'var(--text-muted)' }} />
             </button>
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onDelete(id)
-              }}
+              onClick={(e) => { e.stopPropagation(); onDelete(id) }}
               aria-label="Delete this moment"
               title="Delete"
-              className="p-2.5 sm:p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-2.5 sm:p-1.5 rounded-lg hover:bg-white/10 active:bg-white/15 transition-colors"
             >
               <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" style={{ color: 'var(--text-muted)' }} />
             </button>
@@ -129,29 +89,18 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
         </div>
 
         {/* Bottom row */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginTop: '0.75rem',
-          }}
-        >
+        <div className="flex items-center justify-between mt-3">
           {/* Keyword pills */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexWrap: 'wrap' }}>
+          <div className="flex items-center gap-1 flex-wrap">
             {keywords.map((kw) => (
               <span
                 key={kw}
+                className="text-[0.6rem] uppercase tracking-wide px-1.5 py-0.5 rounded-sm"
                 style={{
+                  fontFamily: 'var(--font-geist-mono)',
                   background: 'rgba(255,255,255,0.06)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   color: 'rgba(255,255,255,0.5)',
-                  fontSize: '0.6rem',
-                  fontFamily: 'var(--font-geist-mono)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  padding: '0.1rem 0.4rem',
-                  borderRadius: '3px',
                 }}
               >
                 {kw}
@@ -159,16 +108,12 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
             ))}
             {extraCount > 0 && (
               <span
+                className="text-[0.6rem] uppercase tracking-wide px-1.5 py-0.5 rounded-sm"
                 style={{
+                  fontFamily: 'var(--font-geist-mono)',
                   background: 'rgba(255,255,255,0.06)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   color: 'rgba(255,255,255,0.5)',
-                  fontSize: '0.6rem',
-                  fontFamily: 'var(--font-geist-mono)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  padding: '0.1rem 0.4rem',
-                  borderRadius: '3px',
                 }}
               >
                 +{extraCount}
@@ -177,25 +122,9 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
           </div>
 
           {/* Track count + timestamp */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-            <span
-              style={{
-                fontFamily: 'var(--font-geist-mono)',
-                fontSize: '0.62rem',
-                color: 'var(--text-muted)',
-              }}
-            >
-              {tracks.length} track{tracks.length !== 1 ? 's' : ''}
-            </span>
-            <span
-              style={{
-                fontFamily: 'var(--font-geist-mono)',
-                fontSize: '0.62rem',
-                color: 'var(--text-muted)',
-              }}
-            >
-              {timeAgo(createdAt)}
-            </span>
+          <div className="flex items-center gap-2 flex-shrink-0 text-[0.62rem]" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}>
+            <span>{tracks.length} track{tracks.length !== 1 ? 's' : ''}</span>
+            <span>{timeAgo(createdAt)}</span>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchSpotifyTracks } from '@/lib/spotify'
 import { fetchAudiusTracks } from '@/lib/audius'
 import { VibeProfile } from '@/types'
+import { rateLimitByIp } from '@/lib/rateLimit'
 
 function isLatinInput(text: string): boolean {
   const letters = text.replace(/[\s\d.,!?'"()\-&_]/g, '')
@@ -11,6 +12,11 @@ function isLatinInput(text: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  const { ok } = rateLimitByIp(request, 'search', { windowMs: 60_000, max: 10 })
+  if (!ok) {
+    return NextResponse.json({ error: 'Too many requests. Please wait a moment.' }, { status: 429 })
+  }
+
   try {
     const body = (await request.json()) as { vibeProfile?: VibeProfile; originalInput?: string }
     const { vibeProfile, originalInput } = body

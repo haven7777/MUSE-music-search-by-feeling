@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { findPreview } from '@/lib/deezer'
+import { rateLimitByIp } from '@/lib/rateLimit'
 
 interface TrackInput {
   id: string
@@ -8,6 +9,11 @@ interface TrackInput {
 }
 
 export async function POST(request: NextRequest) {
+  const { ok } = rateLimitByIp(request, 'itunes', { windowMs: 60_000, max: 15 })
+  if (!ok) {
+    return NextResponse.json({ previews: {} }, { status: 429 })
+  }
+
   try {
     const body = (await request.json()) as { tracks?: TrackInput[] }
     const { tracks } = body

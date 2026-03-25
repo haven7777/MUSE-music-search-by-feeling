@@ -1,6 +1,13 @@
 import { createClient } from './supabase/client'
 import type { MusePlaylist, FavoriteTrack } from '@/types'
 
+export function generateId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
 // ── Moments ──────────────────────────────────────────────────────────────────
 
 export async function savePlaylistCloud(playlist: MusePlaylist): Promise<void> {

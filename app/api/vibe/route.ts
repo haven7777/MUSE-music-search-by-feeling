@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { decodeVibe } from '@/lib/groq'
+import { rateLimitByIp } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
+  const { ok } = rateLimitByIp(request, 'vibe', { windowMs: 60_000, max: 10 })
+  if (!ok) {
+    return NextResponse.json({ error: 'Too many requests. Please wait a moment.' }, { status: 429 })
+  }
+
   try {
     const body = (await request.json()) as { input?: unknown }
     const input = body.input

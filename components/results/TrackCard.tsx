@@ -1,15 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Bookmark, ExternalLink } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { AudiusTrack, SpotifyTrackData, TrackCardProps } from '@/types'
 import { truncateTitle } from '@/lib/utils'
 import { useAudio } from '@/components/shared/AudioContext'
-import { addFavoriteTrackCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
+import { addFavoriteTrackCloud, removeFavoriteTrackCloud, isFavoriteTrackCloud } from '@/lib/cloudStorage'
 import { useAuth } from '@/components/auth/AuthContext'
 import { useToast } from '@/components/shared/Toast'
-import { AnimatePresence } from 'framer-motion'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { FullPlayer } from './FullPlayer'
 import { MiniPlayer } from './MiniPlayer'
@@ -48,6 +47,11 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
   const [showAuthModal, setShowAuthModal] = useState(false)
   const { user } = useAuth()
   const { showToast } = useToast()
+
+  useEffect(() => {
+    if (!user) return
+    isFavoriteTrackCloud(track.id).then(setIsSaved)
+  }, [user, track.id])
 
   function stopProp(e: React.MouseEvent) { e.stopPropagation() }
 
@@ -93,12 +97,9 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.07, duration: 0.35, ease: 'easeOut' }}
-      className="track-card group"
+      className="track-card group relative overflow-hidden cursor-pointer"
       style={{
         padding: 0,
-        overflow: 'hidden',
-        cursor: 'pointer',
-        position: 'relative',
         borderLeftColor: isThisPlaying ? 'var(--muse-primary)' : undefined,
         borderLeftWidth: isThisPlaying ? '2px' : undefined,
       }}
@@ -106,45 +107,25 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
       {/* Pulsing glow dot when playing */}
       {isThisPlaying && (
         <div
-          style={{
-            position: 'absolute', top: '50%', left: '-1px',
-            transform: 'translateY(-50%)',
-            width: '6px', height: '6px', borderRadius: '50%',
-            background: 'var(--muse-primary)',
-            animation: 'pulseGlow 2s ease-in-out infinite',
-            pointerEvents: 'none',
-          }}
+          className="absolute left-[-1px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none animate-pulse-glow"
+          style={{ background: 'var(--muse-primary)' }}
         />
       )}
 
-      {/* Bookmark button — top-right, always visible */}
+      {/* Bookmark button */}
       <button
         onClick={toggleSaved}
         aria-label={isSaved ? 'Remove from saved songs' : 'Save this song'}
+        className="absolute top-1 right-1 z-[2] flex items-center justify-center w-11 h-11 rounded-[10px] border-none cursor-pointer transition-all hover:scale-110 active:scale-95"
         style={{
-          position: 'absolute',
-          top: '4px',
-          right: '4px',
-          zIndex: 2,
           background: isSaved ? 'rgba(var(--muse-primary-rgb), 0.15)' : 'rgba(0,0,0,0.4)',
-          border: 'none',
-          cursor: 'pointer',
-          padding: '12px',
-          borderRadius: '10px',
           color: isSaved ? 'var(--muse-primary)' : 'rgba(255,255,255,0.7)',
-          transition: 'all 0.15s ease',
-          minWidth: '44px',
-          minHeight: '44px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
         }}
-        className="hover:scale-110"
       >
         <Bookmark size={16} fill={isSaved ? 'currentColor' : 'none'} />
       </button>
 
-      <div style={{ padding: '1rem' }}>
+      <div className="p-4">
         <div className="flex gap-3">
           {/* Artwork */}
           <div
@@ -173,7 +154,7 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="font-semibold text-[1rem] leading-tight truncate" title={rawTitle} style={{ color: 'var(--muse-text)' }}>
+                <p className="font-semibold text-base leading-tight truncate" title={rawTitle} style={{ color: 'var(--muse-text)' }}>
                   {displayTitle}
                 </p>
                 <p className="text-[0.88rem] mt-0.5 truncate" title={track.artist} style={{ color: 'var(--text-secondary)' }}>
@@ -192,7 +173,7 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Open ${rawTitle} in Spotify`}
-                  className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-[0.72rem] font-semibold transition-all hover:opacity-90"
+                  className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-[0.72rem] font-semibold transition-all hover:opacity-90 active:scale-95"
                   style={{ background: '#1DB954', color: 'white' }}
                 >
                   <SpotifyIcon />
@@ -209,7 +190,7 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
         </div>
 
         {/* Tap hint */}
-        <p style={{ marginTop: '0.55rem', fontSize: '0.72rem', fontStyle: 'italic', color: 'var(--text-muted)' }}>
+        <p className="mt-2 text-[0.72rem] italic" style={{ color: 'var(--text-muted)' }}>
           Tap for AI analysis &amp; details →
         </p>
       </div>

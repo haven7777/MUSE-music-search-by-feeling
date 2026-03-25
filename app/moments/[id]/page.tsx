@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { MusePlaylist } from '@/types'
-import { getPlaylistById } from '@/lib/storage'
+import { getPlaylistByIdCloud } from '@/lib/cloudStorage'
 import { ResultsPage } from '@/components/results/ResultsPage'
 
 export default function MomentDetailPage() {
@@ -13,8 +13,9 @@ export default function MomentDetailPage() {
 
   useEffect(() => {
     const id = typeof params.id === 'string' ? params.id : ''
-    const found = getPlaylistById(id)
-    setPlaylist(found)
+    getPlaylistByIdCloud(id).then((found) => {
+      setPlaylist(found ?? null)
+    })
   }, [params.id])
 
   if (playlist === undefined) return null // loading

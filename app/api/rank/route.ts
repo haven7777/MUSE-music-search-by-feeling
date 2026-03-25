@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { rankTracks } from '@/lib/groq'
 import { AudiusTrack, RankedTrack, SpotifyTrackData, VibeProfile } from '@/types'
+import { rateLimitByIp } from '@/lib/rateLimit'
 
 interface RankRequestBody {
   originalInput?: string
@@ -12,6 +13,11 @@ interface RankRequestBody {
 }
 
 export async function POST(request: NextRequest) {
+  const { ok } = rateLimitByIp(request, 'rank', { windowMs: 60_000, max: 10 })
+  if (!ok) {
+    return NextResponse.json({ error: 'Too many requests. Please wait a moment.' }, { status: 429 })
+  }
+
   try {
     const body = (await request.json()) as RankRequestBody
     const { originalInput, vibeProfile, tracks } = body
