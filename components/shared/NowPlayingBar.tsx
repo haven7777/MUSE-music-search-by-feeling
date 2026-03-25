@@ -17,7 +17,7 @@ export function NowPlayingBar() {
           transition={{ duration: 0.3 }}
           style={{
             position: 'fixed',
-            bottom: 0,
+            bottom: 'env(safe-area-inset-bottom, 0px)',
             left: 0,
             right: 0,
             height: '3px',

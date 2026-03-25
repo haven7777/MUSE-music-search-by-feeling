@@ -255,20 +255,20 @@ export function MomentsGallery() {
                           rel="noopener noreferrer"
                           aria-label="Open in Spotify"
                           title="Open in Spotify"
-                          style={{ padding: '6px', borderRadius: '6px', color: '#1DB954', display: 'flex' }}
-                          className="hover:bg-white/10 transition-colors"
+                          style={{ padding: '10px', borderRadius: '8px', color: '#1DB954', display: 'flex', minWidth: '44px', minHeight: '44px', alignItems: 'center', justifyContent: 'center' }}
+                          className="hover:bg-white/10 active:bg-white/15 transition-colors"
                         >
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          <ExternalLink className="w-4 h-4" />
                         </a>
                       )}
                       <button
                         onClick={() => handleRemoveSong(song.id)}
                         aria-label="Remove from saved songs"
                         title="Remove"
-                        style={{ padding: '6px', borderRadius: '6px', color: 'var(--text-muted)', display: 'flex', background: 'none', border: 'none', cursor: 'pointer' }}
-                        className="hover:bg-white/10 transition-colors"
+                        style={{ padding: '10px', borderRadius: '8px', color: 'var(--text-muted)', display: 'flex', background: 'none', border: 'none', cursor: 'pointer', minWidth: '44px', minHeight: '44px', alignItems: 'center', justifyContent: 'center' }}
+                        className="hover:bg-white/10 active:bg-white/15 transition-colors"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>

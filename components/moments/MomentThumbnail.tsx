@@ -30,7 +30,6 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
-      className="group"
       style={{
         position: 'relative',
         borderRadius: '16px',
@@ -45,19 +44,10 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: Mome
       tabIndex={0}
       aria-label={`View ${moodLabel} playlist`}
       onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+      className="group moment-card"
       whileHover={{
         y: -2,
         transition: { duration: 0.2 },
-      }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget as HTMLDivElement
-        el.style.borderColor = 'var(--glass-border-bright)'
-        el.style.boxShadow = '0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px var(--glass-border-bright)'
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLDivElement
-        el.style.borderColor = 'var(--glass-border)'
-        el.style.boxShadow = 'none'
       }}
     >
       {/* Left vertical gradient strip */}

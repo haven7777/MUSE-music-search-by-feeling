@@ -300,14 +300,17 @@ function HomePageInner() {
             >
               <button
                 onClick={handleReset}
-                className="text-[0.7rem] sm:text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
+                className="text-[0.7rem] sm:text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 active:scale-95 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
                   color: 'rgba(255,255,255,0.85)',
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.15)',
-                  padding: '0.4rem 0.6rem',
+                  padding: '0.5rem 0.75rem',
                   fontWeight: 600,
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
                 ← New
@@ -317,14 +320,17 @@ function HomePageInner() {
               </span>
               <Link
                 href="/moments"
-                className="text-[0.7rem] sm:text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
+                className="text-[0.7rem] sm:text-[0.75rem] uppercase tracking-widest transition-all hover:opacity-100 active:scale-95 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
                   color: 'rgba(255,255,255,0.85)',
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.15)',
-                  padding: '0.4rem 0.6rem',
+                  padding: '0.5rem 0.75rem',
                   fontWeight: 600,
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
                 Saved ♫

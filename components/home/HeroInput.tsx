@@ -176,14 +176,14 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
             aria-hidden="true"
             tabIndex={-1}
             aria-label="Find my soundtrack"
-            className="flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-105 active:scale-95 sm:hidden"
+            className="flex items-center justify-center w-11 h-11 rounded-full transition-all hover:scale-105 active:scale-95 sm:hidden"
             style={{
               background: canSubmit ? 'var(--muse-primary)' : 'rgba(255,255,255,0.1)',
               color: canSubmit ? 'white' : 'rgba(255,255,255,0.3)',
               opacity: canSubmit ? 1 : 0.5,
             }}
           >
-            <Send className="w-3.5 h-3.5" />
+            <Send className="w-4 h-4" />
           </button>
         </div>
       </motion.div>

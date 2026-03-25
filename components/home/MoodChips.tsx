@@ -54,7 +54,7 @@ export function MoodChips({ onSelect }: MoodChipsProps) {
           whileTap={{ scale: 0.97 }}
           onClick={() => onSelect(chip.label)}
           aria-label={`Explore music for: ${chip.label}`}
-          className="focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent"
+          className="mood-chip focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent"
           style={{
             background: 'transparent',
             border: '1px solid rgba(255,255,255,0.12)',
@@ -66,20 +66,7 @@ export function MoodChips({ onSelect }: MoodChipsProps) {
             flexShrink: 0,
             cursor: 'pointer',
             transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            const el = e.currentTarget as HTMLButtonElement
-            el.style.borderColor = 'color-mix(in srgb, var(--muse-primary) 50%, transparent)'
-            el.style.color = 'var(--muse-primary)'
-            el.style.background = 'rgba(var(--muse-primary-rgb), 0.08)'
-            el.style.transform = 'translateY(-2px)'
-          }}
-          onMouseLeave={(e) => {
-            const el = e.currentTarget as HTMLButtonElement
-            el.style.borderColor = 'rgba(255,255,255,0.12)'
-            el.style.color = 'rgba(255,255,255,0.5)'
-            el.style.background = 'transparent'
-            el.style.transform = 'translateY(0)'
+            minHeight: '44px',
           }}
         >
           {chip.emoji} {chip.label}
@@ -94,35 +81,22 @@ export function MoodChips({ onSelect }: MoodChipsProps) {
         whileTap={{ scale: 0.97 }}
         onClick={handleSurprise}
         aria-label="Surprise me with a random feeling"
-        className="flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1"
+        className="mood-chip flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1"
         style={{
           background: 'transparent',
           border: '1px solid rgba(255,255,255,0.12)',
           color: 'rgba(255,255,255,0.5)',
           borderRadius: '50px',
-          padding: '0.4rem 1rem',
-          fontSize: '0.78rem',
+          padding: '0.65rem 1.35rem',
+          fontSize: '1rem',
           whiteSpace: 'nowrap',
           flexShrink: 0,
           cursor: 'pointer',
           transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={(e) => {
-          const el = e.currentTarget as HTMLButtonElement
-          el.style.borderColor = 'color-mix(in srgb, var(--muse-primary) 50%, transparent)'
-          el.style.color = 'var(--muse-primary)'
-          el.style.background = 'rgba(var(--muse-primary-rgb), 0.08)'
-          el.style.transform = 'translateY(-2px)'
-        }}
-        onMouseLeave={(e) => {
-          const el = e.currentTarget as HTMLButtonElement
-          el.style.borderColor = 'rgba(255,255,255,0.12)'
-          el.style.color = 'rgba(255,255,255,0.5)'
-          el.style.background = 'transparent'
-          el.style.transform = 'translateY(0)'
+          minHeight: '44px',
         }}
       >
-        <Sparkles className="w-3 h-3" />
+        <Sparkles className="w-3.5 h-3.5" />
         Surprise me
       </motion.button>
     </div>

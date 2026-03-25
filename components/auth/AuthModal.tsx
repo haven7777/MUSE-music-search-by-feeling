@@ -67,9 +67,11 @@ export function AuthModal({ onClose }: AuthModalProps) {
           onClick={onClose}
           aria-label="Close"
           style={{
-            position: 'absolute', top: '1rem', right: '1rem',
+            position: 'absolute', top: '0.5rem', right: '0.5rem',
             background: 'none', border: 'none', cursor: 'pointer',
             color: 'var(--text-muted)', display: 'flex',
+            alignItems: 'center', justifyContent: 'center',
+            width: '44px', height: '44px',
           }}
         >
           <X size={18} />
@@ -102,7 +104,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
                       border: '1px solid rgba(255,255,255,0.12)',
                       borderRadius: '10px',
                       padding: '0.75rem 0.875rem 0.75rem 2.5rem',
-                      fontSize: '0.9rem',
+                      fontSize: '16px',
                       color: 'white',
                       outline: 'none',
                       boxSizing: 'border-box',
@@ -150,14 +152,16 @@ export function AuthModal({ onClose }: AuthModalProps) {
               </p>
               <button
                 onClick={onClose}
+                className="active:scale-95"
                 style={{
                   marginTop: '1.5rem',
-                  padding: '0.6rem 1.5rem',
+                  padding: '0.75rem 1.75rem',
+                  minHeight: '44px',
                   background: 'rgba(255,255,255,0.1)',
                   color: 'var(--text-secondary)',
                   border: '1px solid rgba(255,255,255,0.15)',
                   borderRadius: '50px',
-                  fontSize: '0.85rem',
+                  fontSize: '0.9rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}

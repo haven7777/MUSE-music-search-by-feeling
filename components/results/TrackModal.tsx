@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion'
 import { X, ExternalLink, Sparkles, Music } from 'lucide-react'
 import { RankedTrack, SpotifyTrackData, AudiusTrack, VibeProfile } from '@/types'
 import { MiniPlayer } from './MiniPlayer'
@@ -46,6 +46,16 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
     .map((k) => k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
     .filter(Boolean)
 
+  const dragY = useMotionValue(0)
+  const sheetControls = useAnimation()
+  const backdropOpacity = useTransform(dragY, [0, 300], [1, 0])
+  const sheetRef = useRef<HTMLDivElement>(null)
+
+  // Animate sheet in
+  useEffect(() => {
+    void sheetControls.start({ y: 0 })
+  }, [sheetControls])
+
   // Lock body scroll
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -58,6 +68,14 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
+
+  function handleDragEnd(_: unknown, info: PanInfo) {
+    if (info.offset.y > 100 || info.velocity.y > 500) {
+      void sheetControls.start({ y: '100%' }).then(onClose)
+    } else {
+      void sheetControls.start({ y: 0 })
+    }
+  }
 
   const af = spotifyTrack?.audioFeatures
 
@@ -78,46 +96,51 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
+        opacity: backdropOpacity as unknown as number,
       }}
     >
       <motion.div
+        ref={sheetRef}
         initial={{ y: '100%' }}
-        animate={{ y: 0 }}
+        animate={sheetControls}
         exit={{ y: '100%' }}
         transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
+        drag="y"
+        dragConstraints={{ top: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+        style={{ y: dragY }}
         onClick={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: '640px',
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: `linear-gradient(160deg, rgba(var(--muse-primary-rgb, 139,92,246), 0.18) 0%, #08080f 45%)`,
-          border: '1px solid var(--glass-border)',
-          borderBottom: 'none',
-          borderRadius: '28px 28px 0 0',
-          padding: '1.5rem 1.5rem 3rem',
-        }}
+        className="track-modal-sheet"
       >
-        {/* Drag handle */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
-          <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.2)' }} />
+        {/* Drag handle — swipe down to dismiss */}
+        <div
+          style={{
+            display: 'flex', justifyContent: 'center', paddingTop: '0.75rem', paddingBottom: '0.5rem',
+            cursor: 'grab',
+          }}
+        >
+          <div style={{ width: '40px', height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.3)' }} />
         </div>
 
         {/* Top bar: close */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.75rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.25rem', padding: '0 1.5rem' }}>
           <button
             onClick={onClose}
             aria-label="Close"
             style={{
-              width: '36px', height: '36px', borderRadius: '50%',
+              width: '44px', height: '44px', borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'var(--glass-1)', border: '1px solid var(--glass-border)',
               cursor: 'pointer', color: 'var(--text-secondary)',
             }}
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
+
+        {/* Scrollable content with padding */}
+        <div style={{ padding: '0 1.5rem' }}>
 
         {/* Album art + track info */}
         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', marginBottom: '1.75rem' }}>
@@ -278,6 +301,7 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
             </div>
           </div>
         )}
+        </div>{/* end scrollable content padding */}
       </motion.div>
     </motion.div>
   )

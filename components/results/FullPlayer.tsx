@@ -53,8 +53,8 @@ export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayer
         aria-label={isThisPlaying ? `Pause ${title}` : `Play ${title}`}
         className="flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-95"
         style={{
-          width: '34px',
-          height: '34px',
+          width: '44px',
+          height: '44px',
           borderRadius: '50%',
           background: 'var(--muse-primary)',
           boxShadow: isThisPlaying
@@ -66,9 +66,9 @@ export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayer
         }}
       >
         {isThisPlaying ? (
-          <Pause style={{ width: '12px', height: '12px', color: 'white', fill: 'white' }} />
+          <Pause style={{ width: '14px', height: '14px', color: 'white', fill: 'white' }} />
         ) : (
-          <Play style={{ width: '12px', height: '12px', color: 'white', fill: 'white' }} />
+          <Play style={{ width: '14px', height: '14px', color: 'white', fill: 'white' }} />
         )}
       </button>
 

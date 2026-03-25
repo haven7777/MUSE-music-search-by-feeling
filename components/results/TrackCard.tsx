@@ -101,7 +101,6 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
         position: 'relative',
         borderLeftColor: isThisPlaying ? 'var(--muse-primary)' : undefined,
         borderLeftWidth: isThisPlaying ? '2px' : undefined,
-        willChange: 'transform',
       }}
     >
       {/* Pulsing glow dot when playing */}
@@ -124,16 +123,21 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
         aria-label={isSaved ? 'Remove from saved songs' : 'Save this song'}
         style={{
           position: 'absolute',
-          top: '6px',
-          right: '6px',
+          top: '4px',
+          right: '4px',
           zIndex: 2,
           background: isSaved ? 'rgba(var(--muse-primary-rgb), 0.15)' : 'rgba(0,0,0,0.4)',
           border: 'none',
           cursor: 'pointer',
-          padding: '8px',
-          borderRadius: '8px',
+          padding: '12px',
+          borderRadius: '10px',
           color: isSaved ? 'var(--muse-primary)' : 'rgba(255,255,255,0.7)',
           transition: 'all 0.15s ease',
+          minWidth: '44px',
+          minHeight: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
         className="hover:scale-110"
       >

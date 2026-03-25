@@ -166,6 +166,18 @@ body {
   height: 100%;
   background: transparent;
   color: var(--muse-text, var(--text-primary));
+  overscroll-behavior-y: contain;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent 300ms tap delay on interactive elements */
+a, button, [role="button"], input, textarea, select {
+  touch-action: manipulation;
+}
+
+/* iOS input zoom prevention — inputs must be ≥16px */
+input, textarea, select {
+  font-size: 16px;
 }
 
 ::selection {
@@ -281,16 +293,7 @@ a { text-decoration: none; }
   pointer-events: none;
 }
 
-.track-card:hover {
-  background: var(--depth-3);
-  border-color: var(--glass-border-bright);
-  transform: translateY(-2px);
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.35),
-    0 0 0 1px var(--glass-border-bright),
-    0 0 60px var(--glow-primary-ambient);
-  will-change: transform;
-}
+/* Hover is scoped to pointer devices — see HOVER ONLY ON POINTER DEVICES section */
 
 /* ═══════════════════════════════════════════════════════════
    LOADING SKELETON
@@ -323,4 +326,105 @@ a { text-decoration: none; }
     min-width: 44px;
     min-height: 44px;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SAFE AREA INSETS
+   ═══════════════════════════════════════════════════════════ */
+
+/* Bottom-fixed elements respect the home indicator */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Bottom sheet modal */
+.track-modal-sheet {
+  width: 100%;
+  max-width: 640px;
+  max-height: 92dvh;
+  max-height: 92vh; /* fallback for older browsers */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(160deg, rgba(var(--muse-primary-rgb, 139,92,246), 0.18) 0%, #08080f 45%);
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
+  border-radius: 28px 28px 0 0;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+
+@supports (max-height: 92dvh) {
+  .track-modal-sheet {
+    max-height: 92dvh;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HOVER ONLY ON POINTER DEVICES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Prevent :hover stuck states on touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .track-card:hover {
+    background: var(--depth-3);
+    border-color: var(--glass-border-bright);
+    transform: translateY(-2px);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.35),
+      0 0 0 1px var(--glass-border-bright),
+      0 0 60px var(--glow-primary-ambient);
+    will-change: transform;
+  }
+}
+
+/* On touch devices, use :active instead of :hover */
+@media (hover: none) {
+  .track-card:hover {
+    background: var(--depth-2);
+    border-color: var(--glass-border);
+    transform: none;
+    box-shadow: none;
+  }
+  .track-card:active {
+    background: var(--depth-3);
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Mood chips — hover only on pointer devices */
+@media (hover: hover) and (pointer: fine) {
+  .mood-chip:hover {
+    border-color: color-mix(in srgb, var(--muse-primary) 50%, transparent) !important;
+    color: var(--muse-primary) !important;
+    background: rgba(var(--muse-primary-rgb), 0.08) !important;
+    transform: translateY(-2px);
+  }
+}
+.mood-chip:active {
+  transform: scale(0.97);
+}
+
+/* Moment card hover — pointer devices only */
+@media (hover: hover) and (pointer: fine) {
+  .moment-card:hover {
+    border-color: var(--glass-border-bright) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--glass-border-bright);
+  }
+}
+.moment-card:active {
+  transform: scale(0.98);
 }

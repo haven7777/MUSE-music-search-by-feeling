@@ -44,15 +44,22 @@ export default function MomentDetailPage() {
     <main className="min-h-screen flex flex-col" style={{ fontFamily: 'var(--font-geist-sans)' }}>
       {/* Nav */}
       <div
-        className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 border-b"
+        className="sticky top-0 z-20 flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3 border-b"
         style={{ background: 'rgba(8,8,16,0.8)', backdropFilter: 'blur(12px)', borderColor: 'var(--border)' }}
       >
         <Link
           href="/moments"
-          className="text-[0.75rem] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-          style={{ color: 'var(--text-muted)' }}
+          className="text-[0.7rem] sm:text-[0.75rem] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
+          style={{
+            color: 'rgba(255,255,255,0.85)',
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            padding: '0.4rem 0.6rem',
+            fontWeight: 600,
+          }}
         >
-          ← Back to Moments
+          <span className="hidden sm:inline">← Back to </span>
+          <span className="sm:hidden">← </span>Moments
         </Link>
         <span
           className="text-sm font-bold gradient-text"
@@ -62,10 +69,16 @@ export default function MomentDetailPage() {
         </span>
         <Link
           href="/"
-          className="text-[0.75rem] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded"
-          style={{ color: 'var(--text-muted)' }}
+          className="text-[0.7rem] sm:text-[0.75rem] font-mono uppercase tracking-widest transition-opacity hover:opacity-70 focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1 rounded-lg"
+          style={{
+            color: 'rgba(255,255,255,0.85)',
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            padding: '0.4rem 0.6rem',
+            fontWeight: 600,
+          }}
         >
-          New Feeling
+          New <span className="hidden sm:inline">Feeling</span>
         </Link>
       </div>
 
