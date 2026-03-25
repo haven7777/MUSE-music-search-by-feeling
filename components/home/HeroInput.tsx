@@ -17,6 +17,7 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
   const [showHint, setShowHint] = useState(false)
   const [showValidationMsg, setShowValidationMsg] = useState(false)
   const [isListening, setIsListening] = useState(false)
+  const [voiceError, setVoiceError] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
@@ -106,11 +107,22 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
     }
 
     recognition.onend = () => setIsListening(false)
-    recognition.onerror = () => setIsListening(false)
+    recognition.onerror = (event: Event & { error?: string }) => {
+      setIsListening(false)
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        setVoiceError('Voice input is blocked in this browser. Try Chrome or Safari.')
+        setTimeout(() => setVoiceError(''), 4000)
+      }
+    }
 
-    recognition.start()
-    recognitionRef.current = recognition
-    setIsListening(true)
+    try {
+      recognition.start()
+      recognitionRef.current = recognition
+      setIsListening(true)
+    } catch {
+      setVoiceError('Voice input not available in this browser.')
+      setTimeout(() => setVoiceError(''), 4000)
+    }
   }
 
   const canSubmit = value.trim().length >= 3 && !isLoading
@@ -197,8 +209,12 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
               </div>
             )}
 
-            {/* Delayed hint / validation message */}
-            {showValidationMsg ? (
+            {/* Delayed hint / validation / voice error message */}
+            {voiceError ? (
+              <span className="text-[0.7rem]" style={{ color: '#fbbf24' }}>
+                {voiceError}
+              </span>
+            ) : showValidationMsg ? (
               <span className="text-[0.7rem]" style={{ color: '#f87171' }}>
                 Describe how you&apos;re feeling to find your soundtrack
               </span>
