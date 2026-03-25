@@ -80,7 +80,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
       url,
     }
 
-    if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+    if (navigator.share) {
       try {
         await navigator.share(shareData)
         return
