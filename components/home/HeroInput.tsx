@@ -150,14 +150,14 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
       >
         <div className="relative">
           {!value && !focused && (
-            <div className="absolute inset-0 pointer-events-none" style={{ padding: '1.25rem 1.5rem', fontSize: '1rem', lineHeight: '1.7' }}>
+            <div className="absolute inset-0 pointer-events-none" style={{ padding: '0.85rem 1.25rem', fontSize: '0.95rem', lineHeight: '1.6' }}>
               <TypewriterPlaceholder visible={!value && !focused} />
             </div>
           )}
           {!value && focused && (
             <div
               className="absolute inset-0 pointer-events-none"
-              style={{ padding: '1.25rem 1.5rem', fontSize: '1rem', lineHeight: '1.7', color: 'var(--text-muted)' }}
+              style={{ padding: '0.85rem 1.25rem', fontSize: '0.95rem', lineHeight: '1.6', color: 'var(--text-muted)' }}
             >
               Describe your feeling or moment...
             </div>
@@ -169,18 +169,18 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
             onKeyDown={handleKeyDown}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            rows={2}
+            rows={1}
             maxLength={500}
             aria-label="Describe what you're feeling right now"
             className="w-full bg-transparent resize-none outline-none focus-visible:outline-none"
             style={{
-              padding: '1.25rem 1.5rem',
-              fontSize: '1rem',
-              minHeight: '80px',
-              maxHeight: '160px',
+              padding: '0.85rem 1.25rem',
+              fontSize: '0.95rem',
+              minHeight: '52px',
+              maxHeight: '120px',
               color: 'var(--muse-text)',
               caretColor: 'var(--muse-primary)',
-              lineHeight: '1.7',
+              lineHeight: '1.6',
             }}
           />
         </div>
