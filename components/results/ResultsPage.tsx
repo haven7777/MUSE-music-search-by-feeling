@@ -119,7 +119,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          style={{ paddingTop: '0.25rem', paddingBottom: '1rem' }}
+          style={{ paddingTop: '2rem', paddingBottom: '1.5rem' }}
         >
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
             {/* Left: identity */}
@@ -168,7 +168,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
             </div>
 
             {/* Right: actions */}
-            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, paddingTop: '0.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, marginTop: '-0.5rem' }}>
               <button
                 onClick={handleShare}
                 aria-label="Copy share link"
