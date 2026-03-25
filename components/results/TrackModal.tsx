@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion'
 import { X, ExternalLink, Sparkles, Music } from 'lucide-react'
 import { RankedTrack, SpotifyTrackData, AudiusTrack, VibeProfile } from '@/types'
 import { MiniPlayer } from './MiniPlayer'
@@ -47,14 +47,9 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
     .filter(Boolean)
 
   const dragY = useMotionValue(0)
-  const sheetControls = useAnimation()
   const backdropOpacity = useTransform(dragY, [0, 300], [1, 0])
   const sheetRef = useRef<HTMLDivElement>(null)
-
-  // Animate sheet in
-  useEffect(() => {
-    void sheetControls.start({ y: 0 })
-  }, [sheetControls])
+  const [dismissing, setDismissing] = useState(false)
 
   // Lock body scroll
   useEffect(() => {
@@ -71,9 +66,11 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
 
   function handleDragEnd(_: unknown, info: PanInfo) {
     if (info.offset.y > 100 || info.velocity.y > 500) {
-      void sheetControls.start({ y: '100%' }).then(onClose)
+      setDismissing(true)
+      setTimeout(onClose, 300)
     } else {
-      void sheetControls.start({ y: 0 })
+      // Snap back — reset dragY to 0
+      dragY.set(0)
     }
   }
 
@@ -102,7 +99,7 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
       <motion.div
         ref={sheetRef}
         initial={{ y: '100%' }}
-        animate={sheetControls}
+        animate={{ y: dismissing ? '100%' : 0 }}
         exit={{ y: '100%' }}
         transition={{ duration: 0.38, ease: [0.32, 0.72, 0, 1] }}
         drag="y"
