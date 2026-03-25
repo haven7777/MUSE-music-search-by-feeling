@@ -326,6 +326,11 @@ a { text-decoration: none; }
     min-width: 44px;
     min-height: 44px;
   }
+
+  /* Move share/save buttons up on mobile */
+  .results-actions {
+    margin-top: -0.5rem;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════

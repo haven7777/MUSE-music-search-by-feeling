@@ -168,7 +168,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
             </div>
 
             {/* Right: actions */}
-            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, marginTop: '-0.5rem' }}>
+            <div className="results-actions" style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
               <button
                 onClick={handleShare}
                 aria-label="Copy share link"
