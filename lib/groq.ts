@@ -216,3 +216,85 @@ Include ALL tracks provided. No markdown, just JSON array.`,
   ranked.sort((a, b) => a.rank - b.rank)
   return ranked
 }
+
+const VISION_MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
+
+export async function decodeVibeFromImage(imageBase64: string, mimeType: string, textHint?: string): Promise<VibeProfile> {
+  const imagePrompt = textHint
+    ? `The user uploaded this image and said: "${textHint}". Analyze the mood, atmosphere, colors, and emotional tone of this image combined with their words.`
+    : `Analyze the mood, atmosphere, colors, and emotional tone of this image.`
+
+  const response = await groq.chat.completions.create({
+    model: VISION_MODEL,
+    temperature: 0.7,
+    max_tokens: 2000,
+    response_format: { type: 'json_object' },
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: { url: `data:${mimeType};base64,${imageBase64}` },
+          },
+          {
+            type: 'text',
+            text: `You are a synesthetic music curator with perfect emotional intelligence. You translate feelings and images into precise musical and visual parameters.
+
+${imagePrompt}
+
+Then return ONLY a valid JSON object (no markdown, no backticks) matching this exact structure:
+{
+  "emotionalCore": "2-3 word emotional essence",
+  "energyLevel": 0-100,
+  "tempoRange": { "min": 60, "max": 90 },
+  "valenceTarget": 0.0-1.0,
+  "danceability": 0-100,
+  "acousticness": 0-100,
+  "instrumentalness": 0-100,
+  "spotifyGenres": ["genre1", "genre2", "genre3"],
+  "sonicTexture": ["texture1", "texture2", "texture3"],
+  "era": "timeless|70s|80s|90s|2000s|modern",
+  "searchQueries": {
+    "mainstream": ["query1", "query2", "query3", "query4", "query5"],
+    "underground": ["lo-fi genre+mood query1", "genre+emotion query2", "genre+texture query3", "genre+instrument query4", "broader genre query5"]
+  },
+  "colorPalette": {
+    "primary": "#hexcode vivid and emotionally resonant",
+    "secondary": "#hexcode complementary",
+    "background": "#hexcode dark (lightness < 20%)",
+    "text": "#hexcode high contrast on background",
+    "surface": "#hexcode slightly lighter than background"
+  },
+  "moodLabel": "Poetic 2-3 word label"
+}
+
+spotifyGenres MUST be from: acoustic, ambient, blues, chill, classical, country, dance, electronic, emo, folk, funk, grunge, hip-hop, house, indie, indie-pop, jazz, metal, new-age, piano, pop, punk, r-n-b, rainy-day, rock, sad, singer-songwriter, sleep, soul, study, synth-pop, trip-hop`,
+          },
+        ],
+      },
+    ],
+  })
+
+  const text = response.choices[0]?.message?.content ?? ''
+  const parsed = safeParseJson<VibeProfile>(text)
+
+  if (!parsed) {
+    throw new Error('Failed to parse vibe profile from vision response')
+  }
+
+  // Vision models sometimes add descriptions after hex codes — strip them
+  if (parsed.colorPalette) {
+    const extractHex = (val: string) => {
+      const match = val.match(/#[0-9A-Fa-f]{6}/)
+      return match ? match[0] : val
+    }
+    parsed.colorPalette.primary = extractHex(parsed.colorPalette.primary)
+    parsed.colorPalette.secondary = extractHex(parsed.colorPalette.secondary)
+    parsed.colorPalette.background = extractHex(parsed.colorPalette.background)
+    parsed.colorPalette.text = extractHex(parsed.colorPalette.text)
+    parsed.colorPalette.surface = extractHex(parsed.colorPalette.surface)
+  }
+
+  return parsed
+}

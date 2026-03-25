@@ -65,28 +65,8 @@ function HomePageInner() {
     }
   }, [phase])
 
-  async function handleSubmit(input: string) {
-    setLastInput(input)
-    setPhase('processing')
-    setProcessingKeywords([])
-    setErrorMessage('')
-
-    try {
-      // Step 1: Decode vibe
-      const vibeRes = await fetch('/api/vibe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input }),
-      })
-
-      if (!vibeRes.ok) {
-        const err = (await vibeRes.json()) as { error?: string }
-        throw new Error(err.error ?? 'Vibe decoding failed')
-      }
-
-      const vibeProfile = (await vibeRes.json()) as VibeProfile
-
-      const keywords = [vibeProfile.emotionalCore, ...vibeProfile.sonicTexture.slice(0, 4)]
+  async function runPipeline(input: string, vibeProfile: VibeProfile) {
+    const keywords = [vibeProfile.emotionalCore, ...vibeProfile.sonicTexture.slice(0, 4)]
       keywords.forEach((kw, i) => {
         setTimeout(() => {
           setProcessingKeywords((prev) => [...prev, kw])
@@ -170,14 +150,67 @@ function HomePageInner() {
         createdAt: Date.now(),
       })
       setPhase('results')
+  }
+
+  async function handleSubmit(input: string) {
+    setLastInput(input)
+    setPhase('processing')
+    setProcessingKeywords([])
+    setErrorMessage('')
+
+    try {
+      const vibeRes = await fetch('/api/vibe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input }),
+      })
+
+      if (!vibeRes.ok) {
+        const err = (await vibeRes.json()) as { error?: string }
+        throw new Error(err.error ?? 'Vibe decoding failed')
+      }
+
+      const vibeProfile = (await vibeRes.json()) as VibeProfile
+      await runPipeline(input, vibeProfile)
     } catch (err) {
       const raw = err instanceof Error ? err.message : 'Something went wrong'
-      // Map technical errors to friendly messages
       const friendly = raw.includes('429') || raw.toLowerCase().includes('too many')
         ? "You're moving fast! Give it a moment and try again."
         : raw.includes('fetch') || raw.includes('network') || raw.toLowerCase().includes('failed')
         ? "Couldn't reach the music servers. Check your connection and try again."
         : "Something didn't click this time. Try rephrasing your feeling."
+      setErrorMessage(friendly)
+      setPhase('error')
+    }
+  }
+
+  async function handleImageSubmit(imageBase64: string, mimeType: string, hint?: string) {
+    setLastInput(hint || 'Photo mood')
+    setPhase('processing')
+    setProcessingKeywords([])
+    setErrorMessage('')
+
+    try {
+      const vibeRes = await fetch('/api/vibe-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageBase64, mimeType, hint }),
+      })
+
+      if (!vibeRes.ok) {
+        const err = (await vibeRes.json()) as { error?: string }
+        throw new Error(err.error ?? 'Image vibe decoding failed')
+      }
+
+      const vibeProfile = (await vibeRes.json()) as VibeProfile
+      await runPipeline(hint || vibeProfile.moodLabel, vibeProfile)
+    } catch (err) {
+      const raw = err instanceof Error ? err.message : 'Something went wrong'
+      const friendly = raw.includes('429') || raw.toLowerCase().includes('too many')
+        ? "You're moving fast! Give it a moment and try again."
+        : raw.includes('fetch') || raw.includes('network') || raw.toLowerCase().includes('failed')
+        ? "Couldn't reach the music servers. Check your connection and try again."
+        : "Something didn't click this time. Try a different photo."
       setErrorMessage(friendly)
       setPhase('error')
     }
@@ -277,7 +310,7 @@ function HomePageInner() {
                   transition={{ delay: 0.2 }}
                   className="flex flex-col gap-4"
                 >
-                  <HeroInput onSubmit={handleSubmit} isLoading={false} />
+                  <HeroInput onSubmit={handleSubmit} onSubmitImage={handleImageSubmit} isLoading={false} />
                   <MoodChips onSelect={(label) => void handleSubmit(label)} />
                 </motion.div>
               ) : (
