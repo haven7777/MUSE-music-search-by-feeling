@@ -129,7 +129,7 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
   const charPercent = Math.min((value.length / 500) * 100, 100)
 
   return (
-    <form onSubmit={handleSubmit} style={{ width: 'min(680px, 90vw)', margin: '0 auto' }}>
+    <form onSubmit={handleSubmit} style={{ width: 'min(540px, 90vw)', margin: '0 auto' }}>
       {/* Textarea container */}
       <motion.div
         animate={controls}
@@ -138,7 +138,7 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
           border: focused
             ? '1px solid color-mix(in srgb, var(--muse-primary) 60%, transparent)'
             : '1px solid var(--glass-border)',
-          borderRadius: '20px',
+          borderRadius: '14px',
           boxShadow: focused
             ? `0 0 0 1px rgba(var(--muse-primary-rgb), 0.3),
                0 0 20px rgba(var(--muse-primary-rgb), 0.15),
@@ -186,7 +186,7 @@ export function HeroInput({ onSubmit, isLoading }: HeroInputProps) {
         </div>
 
         {/* Footer row inside textarea container */}
-        <div className="flex items-center justify-between gap-3" style={{ padding: '0 1rem 0.75rem' }}>
+        <div className="flex items-center justify-between gap-3" style={{ padding: '0 0.85rem 0.5rem' }}>
           <div className="flex items-center gap-3 flex-1">
             {/* Char progress bar */}
             {value.length > 0 && (
