@@ -119,7 +119,7 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          style={{ paddingTop: '2rem', paddingBottom: '1.5rem' }}
+          style={{ paddingTop: '1rem', paddingBottom: '1.5rem' }}
         >
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
             {/* Left: identity */}
