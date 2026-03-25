@@ -12,6 +12,7 @@ import { useAuth } from '@/components/auth/AuthContext'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { PlaylistColumn } from './PlaylistColumn'
 import { TrackModal } from './TrackModal'
+import { MoodBackground } from './MoodBackground'
 
 interface ResultsPageProps {
   playlist: MusePlaylist
@@ -111,7 +112,8 @@ export function ResultsPage({ playlist }: ResultsPageProps) {
 
   return (
     <>
-    <div className="min-h-screen" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
+    <MoodBackground primary={colorPalette.primary} secondary={colorPalette.secondary} />
+    <div className="min-h-screen relative" style={{ zIndex: 1, paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 1rem' }} className="sm:!px-6">
 
         {/* ── Compact hero header ──────────────────────────────── */}
