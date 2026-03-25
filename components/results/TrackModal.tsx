@@ -50,11 +50,13 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
   const backdropOpacity = useTransform(dragY, [0, 300], [1, 0])
   const sheetRef = useRef<HTMLDivElement>(null)
   const [dismissing, setDismissing] = useState(false)
+  const canClose = useRef(false)
 
-  // Lock body scroll
+  // Lock body scroll + prevent click-through from triggering immediate close
   useEffect(() => {
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
+    const timer = setTimeout(() => { canClose.current = true }, 300)
+    return () => { clearTimeout(timer); document.body.style.overflow = '' }
   }, [])
 
   // Close on Escape
@@ -82,7 +84,7 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      onClick={onClose}
+      onClick={() => { if (canClose.current) onClose() }}
       style={{
         position: 'fixed',
         inset: 0,
