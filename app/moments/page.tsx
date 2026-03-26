@@ -32,7 +32,7 @@ export default function MomentsPage() {
               className="text-3xl sm:text-4xl font-extrabold gradient-text"
               style={{ fontFamily: 'var(--font-syne)' }}
             >
-              Saved Moments
+              Your Collection
             </h1>
             <p className="text-[0.9rem] sm:text-[1rem] mt-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Every feeling you translated into music.

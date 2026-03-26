@@ -11,15 +11,81 @@ interface MomentThumbnailProps {
   onDelete: (id: string) => void
   onReexplore: (input: string) => void
   index: number
+  compact?: boolean
 }
 
-export function MomentThumbnail({ playlist, onDelete, onReexplore, index }: MomentThumbnailProps) {
+export function MomentThumbnail({ playlist, onDelete, onReexplore, index, compact }: MomentThumbnailProps) {
   const { id, originalInput, vibeProfile, tracks, createdAt } = playlist
   const { colorPalette, moodLabel } = vibeProfile
   const router = useRouter()
 
   function handleClick() {
     router.push(`/?moment=${id}`)
+  }
+
+  if (compact) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.04 }}
+        className="group relative overflow-hidden cursor-pointer transition-[transform,border-color,box-shadow] duration-200"
+        style={{
+          background: 'var(--depth-2)',
+          border: '1px solid var(--glass-border)',
+          borderRadius: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          padding: '0.5rem 0.75rem',
+        }}
+        onClick={handleClick}
+        role="button"
+        tabIndex={0}
+        aria-label={`View ${moodLabel} playlist`}
+        onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+        whileHover={{ y: -1, transition: { duration: 0.15 } }}
+      >
+        {/* Color dot */}
+        <div style={{ width: '40px', height: '40px', borderRadius: '8px', flexShrink: 0, background: `linear-gradient(135deg, ${colorPalette.primary}, ${colorPalette.secondary})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'white', fontFamily: 'var(--font-syne)' }}>
+            {tracks.length}
+          </span>
+        </div>
+
+        {/* Info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontWeight: 700, fontSize: '0.88rem', color: colorPalette.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-syne)' }}>
+            {moodLabel}
+          </p>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontStyle: 'italic' }}>
+            &ldquo;{originalInput}&rdquo;
+          </p>
+        </div>
+
+        {/* Actions — always visible */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', flexShrink: 0 }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); onReexplore(originalInput) }}
+            aria-label="Re-explore this feeling"
+            title="Re-explore"
+            style={{ padding: '8px', borderRadius: '8px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            className="hover:bg-white/10 active:bg-white/15 transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(id) }}
+            aria-label="Delete this moment"
+            title="Delete"
+            style={{ padding: '8px', borderRadius: '8px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            className="hover:bg-white/10 active:bg-white/15 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </motion.div>
+    )
   }
 
   const keywords = vibeProfile.sonicTexture?.slice(0, 3) ?? []

@@ -121,6 +121,13 @@ export async function removeFavoriteTrackCloud(id: string): Promise<void> {
   await supabase.from('saved_songs').delete().eq('id', id)
 }
 
+export async function clearAllFavoriteTracksCloud(): Promise<void> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('saved_songs').delete().eq('user_id', user.id)
+}
+
 export async function isFavoriteTrackCloud(id: string): Promise<boolean> {
   const supabase = createClient()
   const { data } = await supabase.from('saved_songs').select('id').eq('id', id).single()

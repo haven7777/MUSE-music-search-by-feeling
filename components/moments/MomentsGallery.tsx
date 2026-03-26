@@ -5,11 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Trash2, ExternalLink } from 'lucide-react'
 import { FavoriteTrack, MusePlaylist } from '@/types'
-import { clearAllPlaylistsCloud, deletePlaylistCloud, getPlaylistsCloud, getFavoriteTracksCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
+import { clearAllPlaylistsCloud, clearAllFavoriteTracksCloud, deletePlaylistCloud, getPlaylistsCloud, getFavoriteTracksCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
 import { useToast } from '@/components/shared/Toast'
 import { useAuth } from '@/components/auth/AuthContext'
-import { MiniPlayer } from '@/components/results/MiniPlayer'
-import { FullPlayer } from '@/components/results/FullPlayer'
 import { MomentCardSkeleton, SavedSongSkeleton } from '@/components/shared/LoadingSkeleton'
 import { MomentThumbnail } from './MomentThumbnail'
 
@@ -17,6 +15,7 @@ export function MomentsGallery() {
   const [playlists, setPlaylists] = useState<MusePlaylist[]>([])
   const [savedSongs, setSavedSongs] = useState<FavoriteTrack[]>([])
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [showClearSongsConfirm, setShowClearSongsConfirm] = useState(false)
   const [dataLoading, setDataLoading] = useState(true)
   const { showToast } = useToast()
   const { user, loading: authLoading } = useAuth()
@@ -46,6 +45,13 @@ export function MomentsGallery() {
     showToast('All moments cleared', 'info')
   }
 
+  function handleClearAllSongs() {
+    void clearAllFavoriteTracksCloud()
+    setSavedSongs([])
+    setShowClearSongsConfirm(false)
+    showToast('All songs cleared', 'info')
+  }
+
   function handleReexplore(input: string) {
     router.push(`/?q=${encodeURIComponent(input)}`)
   }
@@ -61,24 +67,29 @@ export function MomentsGallery() {
 
   if (authLoading || (user && dataLoading)) {
     return (
-      <div>
-        <section style={{ marginBottom: '3rem' }}>
-          <div className="flex items-center justify-between mb-6">
-            <div className="skeleton-block" style={{ height: '16px', width: '140px' }} />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 3 }).map((_, i) => <MomentCardSkeleton key={i} />)}
-          </div>
-        </section>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }} className="moments-layout">
         <section>
           <div className="flex items-center gap-3 mb-5">
             <div className="skeleton-block" style={{ width: '3px', height: '22px', borderRadius: '2px' }} />
             <div className="skeleton-block" style={{ height: '16px', width: '110px' }} />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1.5">
             {Array.from({ length: 3 }).map((_, i) => <SavedSongSkeleton key={i} />)}
           </div>
         </section>
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <div className="skeleton-block" style={{ height: '16px', width: '140px' }} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {Array.from({ length: 3 }).map((_, i) => <MomentCardSkeleton key={i} />)}
+          </div>
+        </section>
+        <style>{`
+          @media (max-width: 640px) {
+            .moments-layout { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
       </div>
     )
   }
@@ -152,50 +163,186 @@ export function MomentsGallery() {
   }
 
   return (
-    <div>
-      {/* ── Saved Moments ── */}
-      {hasPlaylists && (
-        <section style={{ marginBottom: hasSongs ? '3rem' : 0 }}>
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-[0.95rem] font-semibold" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-secondary)' }}>
-              {playlists.length}/{MAX} moments saved
-            </p>
-            {!showClearConfirm ? (
+    <div style={{ display: 'grid', gridTemplateColumns: hasSongs && hasPlaylists ? '1fr 1fr' : '1fr', gap: '2rem', alignItems: 'start' }} className="moments-layout">
+      {/* ── Saved Songs (LEFT) ── */}
+      {hasSongs && (
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '3px', height: '22px', background: 'var(--muse-primary)', borderRadius: '2px' }} />
+              <h2 style={{ fontFamily: 'var(--font-syne)', fontSize: '1.1rem', letterSpacing: '0.05em', color: 'var(--text-secondary)', fontWeight: 700 }}>
+                Saved Songs
+              </h2>
+              <span style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>
+                {savedSongs.length}
+              </span>
+            </div>
+            {!showClearSongsConfirm ? (
               <button
-                onClick={() => setShowClearConfirm(true)}
-                className="flex items-center gap-1.5 transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full"
+                onClick={() => setShowClearSongsConfirm(true)}
+                className="flex items-center gap-1 transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full"
                 style={{
                   fontFamily: 'var(--font-geist-mono)',
-                  fontSize: '0.88rem',
+                  fontSize: '0.7rem',
                   fontWeight: 600,
                   color: '#fca5a5',
                   background: 'rgba(239,68,68,0.12)',
                   border: '1px solid rgba(239,68,68,0.35)',
-                  padding: '0.5rem 1rem',
-                  marginTop: '0.5rem',
+                  padding: '0.35rem 0.75rem',
                 }}
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-3 h-3" />
                 Clear all
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <span className="text-[0.8rem]" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}>
-                  Delete all {playlists.length} moments?
+                <span className="text-[0.7rem]" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}>
+                  Delete all?
+                </span>
+                <button
+                  onClick={handleClearAllSongs}
+                  className="text-[0.7rem] px-2.5 py-1 rounded-full transition-all hover:opacity-90 font-semibold"
+                  style={{ fontFamily: 'var(--font-geist-mono)', background: '#ef4444', color: 'white' }}
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={() => setShowClearSongsConfirm(false)}
+                  className="text-[0.7rem] px-2.5 py-1 rounded-full transition-all hover:opacity-80 font-semibold"
+                  style={{ fontFamily: 'var(--font-geist-mono)', background: 'rgba(255,255,255,0.1)', color: 'var(--text-secondary)' }}
+                >
+                  No
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {savedSongs.map((song) => (
+              <div
+                key={song.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  background: 'var(--depth-2)',
+                  border: '1px solid var(--glass-border)',
+                  borderRadius: '12px',
+                  padding: '0.5rem 0.75rem',
+                }}
+              >
+                {/* Artwork */}
+                <div style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, background: 'var(--muse-surface)' }}>
+                  {song.coverArt ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={song.coverArt} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🎵</div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--muse-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {song.title}
+                  </p>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {song.artist}
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', flexShrink: 0 }}>
+                  {song.spotifyUrl && (
+                    <a
+                      href={song.spotifyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Open in Spotify"
+                      title="Open in Spotify"
+                      style={{ padding: '8px', borderRadius: '8px', color: '#1DB954', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      className="hover:bg-white/10 active:bg-white/15 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {song.source === 'audius' && (
+                    <a
+                      href={`https://audius.co/tracks/${song.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Open in Audius"
+                      title="Open in Audius"
+                      style={{ padding: '8px', borderRadius: '8px', color: '#CC0FE0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      className="hover:bg-white/10 active:bg-white/15 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  <button
+                    onClick={() => handleRemoveSong(song.id)}
+                    aria-label="Remove from saved songs"
+                    title="Remove"
+                    style={{ padding: '8px', borderRadius: '8px', color: 'var(--text-muted)', display: 'flex', background: 'none', border: 'none', cursor: 'pointer', alignItems: 'center', justifyContent: 'center' }}
+                    className="hover:bg-white/10 active:bg-white/15 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Saved Moments (RIGHT) ── */}
+      {hasPlaylists && (
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ width: '3px', height: '22px', background: 'var(--muse-secondary, var(--muse-primary))', borderRadius: '2px' }} />
+              <h2 style={{ fontFamily: 'var(--font-syne)', fontSize: '1.1rem', letterSpacing: '0.05em', color: 'var(--text-secondary)', fontWeight: 700 }}>
+                Saved Moments
+              </h2>
+              <span style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>
+                {playlists.length}
+              </span>
+            </div>
+            {!showClearConfirm ? (
+              <button
+                onClick={() => setShowClearConfirm(true)}
+                className="flex items-center gap-1 transition-all hover:opacity-100 focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full"
+                style={{
+                  fontFamily: 'var(--font-geist-mono)',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  color: '#fca5a5',
+                  background: 'rgba(239,68,68,0.12)',
+                  border: '1px solid rgba(239,68,68,0.35)',
+                  padding: '0.35rem 0.75rem',
+                }}
+              >
+                <Trash2 className="w-3 h-3" />
+                Clear all
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-[0.7rem]" style={{ fontFamily: 'var(--font-geist-mono)', color: 'var(--text-muted)' }}>
+                  Delete all?
                 </span>
                 <button
                   onClick={handleClearAll}
-                  className="text-[0.8rem] px-3 py-1.5 rounded-full transition-all hover:opacity-90 font-semibold"
+                  className="text-[0.7rem] px-2.5 py-1 rounded-full transition-all hover:opacity-90 font-semibold"
                   style={{ fontFamily: 'var(--font-geist-mono)', background: '#ef4444', color: 'white' }}
                 >
-                  Yes, clear
+                  Yes
                 </button>
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="text-[0.8rem] px-3 py-1.5 rounded-full transition-all hover:opacity-80 font-semibold"
+                  className="text-[0.7rem] px-2.5 py-1 rounded-full transition-all hover:opacity-80 font-semibold"
                   style={{ fontFamily: 'var(--font-geist-mono)', background: 'rgba(255,255,255,0.1)', color: 'var(--text-secondary)' }}
                 >
-                  Cancel
+                  No
                 </button>
               </div>
             )}
@@ -207,7 +354,7 @@ export function MomentsGallery() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-2">
             {playlists.map((playlist, i) => (
               <MomentThumbnail
                 key={playlist.id}
@@ -215,106 +362,20 @@ export function MomentsGallery() {
                 onDelete={handleDelete}
                 onReexplore={handleReexplore}
                 index={i}
+                compact
               />
             ))}
           </div>
         </section>
       )}
 
-      {/* ── Saved Songs ── */}
-      {hasSongs && (
-        <section>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-            <div style={{ width: '3px', height: '22px', background: 'var(--muse-primary)', borderRadius: '2px' }} />
-            <h2 style={{ fontFamily: 'var(--font-syne)', fontSize: '1.1rem', letterSpacing: '0.05em', color: 'var(--text-secondary)', fontWeight: 700 }}>
-              Saved Songs
-            </h2>
-            <span style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              ({savedSongs.length})
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            {savedSongs.map((song) => (
-              <div
-                key={song.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.875rem',
-                  background: 'var(--depth-2)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: '12px',
-                  padding: '0.75rem 1rem',
-                }}
-              >
-                {/* Artwork */}
-                <div style={{ width: '44px', height: '44px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, background: 'var(--muse-surface)' }}>
-                  {song.coverArt ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={song.coverArt} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>🎵</div>
-                  )}
-                </div>
-
-                {/* Info + Player */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
-                    <div style={{ minWidth: 0 }}>
-                      <p style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--muse-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {song.title}
-                      </p>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {song.artist}
-                      </p>
-                      {song.moodLabel && (
-                        <p style={{ fontFamily: 'var(--font-geist-mono)', fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                          {song.moodLabel}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Actions */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
-                      {song.spotifyUrl && (
-                        <a
-                          href={song.spotifyUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="Open in Spotify"
-                          title="Open in Spotify"
-                          style={{ padding: '10px', borderRadius: '8px', color: '#1DB954', display: 'flex', minWidth: '44px', minHeight: '44px', alignItems: 'center', justifyContent: 'center' }}
-                          className="hover:bg-white/10 active:bg-white/15 transition-colors"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                      <button
-                        onClick={() => handleRemoveSong(song.id)}
-                        aria-label="Remove from saved songs"
-                        title="Remove"
-                        style={{ padding: '10px', borderRadius: '8px', color: 'var(--text-muted)', display: 'flex', background: 'none', border: 'none', cursor: 'pointer', minWidth: '44px', minHeight: '44px', alignItems: 'center', justifyContent: 'center' }}
-                        className="hover:bg-white/10 active:bg-white/15 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Preview player */}
-                  {song.source === 'spotify' && song.previewUrl && (
-                    <MiniPlayer previewUrl={song.previewUrl} trackId={song.id} title={song.title} />
-                  )}
-                  {song.source === 'audius' && song.streamUrl && (
-                    <FullPlayer streamUrl={song.streamUrl} trackId={song.id} title={song.title} durationMs={0} />
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <style>{`
+        @media (max-width: 640px) {
+          .moments-layout {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
