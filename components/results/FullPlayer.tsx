@@ -1,10 +1,9 @@
 'use client'
 
 import { Pause, Play } from 'lucide-react'
-import { useRef } from 'react'
 import { useAudio } from '@/components/shared/AudioContext'
 import { formatDuration } from '@/lib/utils'
-import { WaveformBars } from './WaveformBars'
+import { WaveformProgress } from './WaveformProgress'
 
 interface FullPlayerProps {
   streamUrl: string
@@ -16,7 +15,6 @@ interface FullPlayerProps {
 export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayerProps) {
   const { play, pause, seek, currentTrackId, isPlaying, progress, currentTime, duration } =
     useAudio()
-  const barRef = useRef<HTMLDivElement>(null)
 
   const isThisPlaying = currentTrackId === trackId && isPlaying
   const isThisTrack = currentTrackId === trackId
@@ -27,19 +25,6 @@ export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayer
     } else {
       play(trackId, streamUrl)
     }
-  }
-
-  function handleBarKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
-    if (!isThisTrack || !duration) return
-    if (e.key === 'ArrowRight') seek(Math.min(progress + 5 / duration, 1))
-    else if (e.key === 'ArrowLeft') seek(Math.max(progress - 5 / duration, 0))
-  }
-
-  function handleBarClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (!barRef.current || !isThisTrack) return
-    const rect = barRef.current.getBoundingClientRect()
-    const ratio = (e.clientX - rect.left) / rect.width
-    seek(Math.min(Math.max(ratio, 0), 1))
   }
 
   const displayProgress = isThisTrack ? progress : 0
@@ -72,40 +57,13 @@ export function FullPlayer({ streamUrl, trackId, title, durationMs }: FullPlayer
         )}
       </button>
 
-      {isThisPlaying && <WaveformBars isPlaying={isThisPlaying} />}
-
-      {/* Interactive seekable progress bar */}
-      <div
-        ref={barRef}
-        onClick={handleBarClick}
-        onKeyDown={handleBarKeyDown}
-        tabIndex={isThisTrack ? 0 : -1}
-        className="flex-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-1"
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(displayProgress * 100)}
-        aria-label={`${title} progress — use arrow keys to seek`}
-        style={{
-          height: '6px',
-          background: 'rgba(255,255,255,0.1)',
-          borderRadius: '3px',
-          cursor: 'pointer',
-          overflow: 'hidden',
-          padding: '8px 0',
-          backgroundClip: 'content-box',
-        }}
-      >
-        <div
-          style={{
-            height: '100%',
-            width: `${displayProgress * 100}%`,
-            background: 'var(--muse-primary)',
-            borderRadius: '2px',
-            transition: 'width 100ms linear',
-          }}
-        />
-      </div>
+      <WaveformProgress
+        progress={displayProgress}
+        isPlaying={isThisPlaying}
+        seekable={isThisTrack}
+        onSeek={isThisTrack ? seek : undefined}
+        barCount={45}
+      />
 
       <span
         className="flex-shrink-0"

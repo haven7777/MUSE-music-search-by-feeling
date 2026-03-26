@@ -3,7 +3,7 @@
 import { Pause, Play } from 'lucide-react'
 import { useAudio } from '@/components/shared/AudioContext'
 import { formatDuration } from '@/lib/utils'
-import { WaveformBars } from './WaveformBars'
+import { WaveformProgress } from './WaveformProgress'
 
 interface MiniPlayerProps {
   previewUrl: string
@@ -53,28 +53,7 @@ export function MiniPlayer({ previewUrl, trackId, title }: MiniPlayerProps) {
         )}
       </button>
 
-      {isThisPlaying && <WaveformBars isPlaying={isThisPlaying} />}
-
-      {/* Progress track */}
-      <div
-        className="flex-1"
-        style={{
-          height: '2px',
-          background: 'rgba(255,255,255,0.1)',
-          borderRadius: '1px',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            height: '100%',
-            width: `${progress}%`,
-            background: 'var(--muse-primary)',
-            borderRadius: '1px',
-            transition: 'width 0.25s linear',
-          }}
-        />
-      </div>
+      <WaveformProgress progress={progress / 100} isPlaying={isThisPlaying} barCount={30} />
 
       <span
         className="flex-shrink-0"

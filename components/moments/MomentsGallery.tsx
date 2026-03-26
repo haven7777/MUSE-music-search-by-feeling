@@ -9,6 +9,7 @@ import { clearAllPlaylistsCloud, clearAllFavoriteTracksCloud, deletePlaylistClou
 import { useToast } from '@/components/shared/Toast'
 import { useAuth } from '@/components/auth/AuthContext'
 import { useAudio } from '@/components/shared/AudioContext'
+import { WaveformProgress } from '@/components/results/WaveformProgress'
 import { MomentCardSkeleton, SavedSongSkeleton } from '@/components/shared/LoadingSkeleton'
 import { MomentThumbnail } from './MomentThumbnail'
 
@@ -20,7 +21,7 @@ export function MomentsGallery() {
   const [dataLoading, setDataLoading] = useState(true)
   const { showToast } = useToast()
   const { user, loading: authLoading } = useAuth()
-  const { play, pause: pauseAudio, currentTrackId, isPlaying } = useAudio()
+  const { play, pause: pauseAudio, seek, currentTrackId, isPlaying, progress: audioProgress } = useAudio()
   const router = useRouter()
   const MAX = 50
 
@@ -237,34 +238,44 @@ export function MomentsGallery() {
                   padding: '0.65rem 0.9rem',
                 }}
               >
-                {/* Artwork with play overlay */}
-                <div
-                  style={{ width: '52px', height: '52px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: 'var(--muse-surface)', position: 'relative', cursor: audioSrc ? 'pointer' : 'default' }}
-                  onClick={() => {
-                    if (!audioSrc) return
-                    if (isCurrentPlaying) { pauseAudio() } else { play(`saved-${song.id}`, audioSrc) }
-                  }}
-                >
+                {/* Play button */}
+                {audioSrc && (
+                  <button
+                    onClick={() => {
+                      if (isCurrentPlaying) { pauseAudio() } else { play(`saved-${song.id}`, audioSrc) }
+                    }}
+                    aria-label={isCurrentPlaying ? `Pause ${song.title}` : `Play ${song.title}`}
+                    className="flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-95"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      background: 'var(--muse-primary)',
+                      boxShadow: isCurrentPlaying ? '0 0 12px rgba(var(--muse-primary-rgb), 0.5)' : 'none',
+                      transition: 'box-shadow 0.3s ease',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {isCurrentPlaying ? (
+                      <Pause style={{ width: '14px', height: '14px', color: 'white', fill: 'white' }} />
+                    ) : (
+                      <Play style={{ width: '14px', height: '14px', color: 'white', fill: 'white' }} />
+                    )}
+                  </button>
+                )}
+
+                {/* Artwork */}
+                <div style={{ width: '52px', height: '52px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: 'var(--muse-surface)' }}>
                   {song.coverArt ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={song.coverArt} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>🎵</div>
                   )}
-                  {audioSrc && (
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: isCurrentPlaying ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      opacity: isCurrentPlaying ? 1 : 0,
-                      transition: 'opacity 0.15s ease',
-                    }} className="group-song-overlay">
-                      {isCurrentPlaying ? <Pause size={18} color="white" /> : <Play size={18} color="white" style={{ marginLeft: '2px' }} />}
-                    </div>
-                  )}
                 </div>
 
-                {/* Info */}
+                {/* Info + Waveform */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--muse-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {song.title}
@@ -272,6 +283,17 @@ export function MomentsGallery() {
                   <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {song.artist}
                   </p>
+                  {isCurrent && (
+                    <div style={{ marginTop: '0.35rem' }}>
+                      <WaveformProgress
+                        progress={audioProgress}
+                        isPlaying={isCurrentPlaying}
+                        seekable={song.source === 'audius'}
+                        onSeek={song.source === 'audius' ? seek : undefined}
+                        barCount={30}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions */}
@@ -316,10 +338,6 @@ export function MomentsGallery() {
               )
             })}
           </div>
-          <style>{`
-            .group-song-overlay { opacity: 0; }
-            div:hover > .group-song-overlay { opacity: 1 !important; }
-          `}</style>
         </section>
       )}
 
