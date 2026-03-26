@@ -155,7 +155,7 @@ export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProp
           >
             {track.coverArt ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={track.coverArt} alt={`${track.title} album art`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={track.coverArt} alt={`${track.title} album art`} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--muse-surface)', fontSize: '2rem' }}>
                 🎵

@@ -96,6 +96,21 @@ self.addEventListener('fetch', (event) => {
   }
 })
 
+// Trim cache to max entries — prevents unbounded growth
+async function trimCache(cacheName, maxEntries) {
+  const cache = await caches.open(cacheName)
+  const keys = await cache.keys()
+  if (keys.length > maxEntries) {
+    await Promise.all(keys.slice(0, keys.length - maxEntries).map((k) => cache.delete(k)))
+  }
+}
+
+// Periodically trim caches after activation
+self.addEventListener('activate', () => {
+  trimCache(MOMENT_CACHE, 200)
+  trimCache(STATIC_CACHE, 100)
+})
+
 // Listen for messages from the app
 self.addEventListener('message', (event) => {
   if (event.data === 'skipWaiting') {

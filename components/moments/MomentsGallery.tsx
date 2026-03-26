@@ -269,7 +269,7 @@ export function MomentsGallery() {
                 <div style={{ width: '52px', height: '52px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: 'var(--muse-surface)' }}>
                   {song.coverArt ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={song.coverArt} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={song.coverArt} alt={song.title} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>🎵</div>
                   )}

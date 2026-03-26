@@ -137,6 +137,7 @@ export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardPr
                 src={track.coverArt}
                 alt={`${rawTitle} by ${track.artist}`}
                 loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
