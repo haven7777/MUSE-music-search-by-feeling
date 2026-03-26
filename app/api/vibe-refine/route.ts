@@ -22,6 +22,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid refinement request.' }, { status: 400 })
     }
 
+    if (typeof originalInput !== 'string' || originalInput.length > 500) {
+      return NextResponse.json({ error: 'Invalid input.' }, { status: 400 })
+    }
+
+    // Cap serialized currentVibe size to prevent token inflation attacks
+    if (JSON.stringify(currentVibe).length > 5000) {
+      return NextResponse.json({ error: 'Invalid vibe profile.' }, { status: 400 })
+    }
+
     const refined = await refineVibe(currentVibe, originalInput, refinement.trim())
     return NextResponse.json(refined)
   } catch (error) {

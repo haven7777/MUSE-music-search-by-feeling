@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as RankRequestBody
     const { originalInput, vibeProfile, tracks } = body
 
-    if (!originalInput || !vibeProfile || !Array.isArray(tracks)) {
+    if (!originalInput || !vibeProfile || !Array.isArray(tracks) || tracks.length > 50) {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
 

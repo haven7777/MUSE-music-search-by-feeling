@@ -25,6 +25,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Image is too large. Please use an image under 5MB.' }, { status: 400 })
     }
 
+    // Validate base64 character set
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(body.image)) {
+      return NextResponse.json({ error: 'Invalid image data.' }, { status: 400 })
+    }
+
     const vibeProfile = await decodeVibeFromImage(body.image, body.mimeType, body.hint?.trim())
     console.log('[/api/vibe-image] colorPalette:', JSON.stringify(vibeProfile.colorPalette))
     return NextResponse.json(vibeProfile)

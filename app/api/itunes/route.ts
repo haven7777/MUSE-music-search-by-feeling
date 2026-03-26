@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as { tracks?: TrackInput[] }
     const { tracks } = body
 
-    if (!Array.isArray(tracks)) {
+    if (!Array.isArray(tracks) || tracks.length > 50) {
       return NextResponse.json({ error: 'Invalid tracks array' }, { status: 400 })
     }
 

@@ -23,7 +23,7 @@ jobs:
 
       - name: Check required env vars documented
         run: |
-          for var in GROQ_API_KEY GEMINI_API_KEY SPOTIFY_CLIENT_ID SPOTIFY_CLIENT_SECRET NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY; do
+          for var in GROQ_API_KEY SPOTIFY_CLIENT_ID SPOTIFY_CLIENT_SECRET NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY; do
             grep -q "$var" .env.example || (echo "Missing $var in .env.example" && exit 1)
           done
 
@@ -40,7 +40,6 @@ jobs:
         run: npx next build
         env:
           GROQ_API_KEY: dummy
-          GEMINI_API_KEY: dummy
           SPOTIFY_CLIENT_ID: dummy
           SPOTIFY_CLIENT_SECRET: dummy
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
