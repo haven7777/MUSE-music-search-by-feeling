@@ -1,5 +1,5 @@
 import { AudiusTrack } from '@/types'
-import { formatCount, sanitizeTitle } from './utils'
+import { sanitizeTitle } from './utils'
 
 const AUDIUS_BASE = 'https://api.audius.co/v1'
 const MIN_PLAY_COUNT = 10
@@ -150,4 +150,3 @@ export async function fetchAudiusTracks(
   return diverse
 }
 
-export { formatCount as formatPlayCount }
