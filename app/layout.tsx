@@ -6,6 +6,7 @@ import { AudioProvider } from '@/components/shared/AudioContext'
 import { DynamicBackground } from '@/components/shared/DynamicBackground'
 import { ToastProvider } from '@/components/shared/Toast'
 import { NowPlayingBar } from '@/components/shared/NowPlayingBar'
+import { ServiceWorkerRegistration } from '@/components/shared/ServiceWorkerRegistration'
 import { AuthProvider } from '@/components/auth/AuthContext'
 
 const geistSans = localFont({
@@ -54,12 +55,21 @@ export const metadata: Metadata = {
   icons: {
     apple: '/apple-touch-icon.png',
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'MUSE',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} antialiased`}>
+        <ServiceWorkerRegistration />
         <AuthProvider>
           <ToastProvider>
             <AudioProvider>
