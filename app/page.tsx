@@ -28,6 +28,7 @@ function HomePageInner() {
   const [playlist, setPlaylist] = useState<MusePlaylist | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isRefining, setIsRefining] = useState(false)
   const refreshCountRef = useRef(0)
   const didAutoSubmit = useRef(false)
   const { pause } = useAudio()
@@ -233,6 +234,32 @@ function HomePageInner() {
     }
   }
 
+  async function handleRefine(refinement: string) {
+    if (!playlist || isRefining) return
+    setIsRefining(true)
+    try {
+      const refineRes = await fetch('/api/vibe-refine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentVibe: playlist.vibeProfile,
+          originalInput: playlist.originalInput,
+          refinement,
+        }),
+      })
+
+      if (!refineRes.ok) throw new Error('Refinement failed')
+
+      const refinedVibe = (await refineRes.json()) as VibeProfile
+      refreshCountRef.current = 0
+      await runPipeline(playlist.originalInput, refinedVibe)
+    } catch {
+      // silently fail — user can try again
+    } finally {
+      setIsRefining(false)
+    }
+  }
+
   function handleReset() {
     pause()
     setPhase('input')
@@ -392,7 +419,7 @@ function HomePageInner() {
                 Saved ♫
               </Link>
             </div>
-            <ResultsPage playlist={playlist} onRefresh={handleRefresh} isRefreshing={isRefreshing} />
+            <ResultsPage playlist={playlist} onRefresh={handleRefresh} isRefreshing={isRefreshing} onRefine={handleRefine} isRefining={isRefining} />
           </motion.div>
         )}
 

@@ -122,6 +122,51 @@ Color rules:
   return parsed
 }
 
+export async function refineVibe(currentVibe: VibeProfile, originalInput: string, refinement: string): Promise<VibeProfile> {
+  const response = await groq.chat.completions.create({
+    model: MODEL,
+    temperature: 0.7,
+    response_format: { type: 'json_object' },
+    messages: [
+      {
+        role: 'system',
+        content: `You are a synesthetic music curator. The user already has a vibe profile from their original feeling. They want to REFINE it — adjust the musical parameters based on their feedback while keeping the core mood intact.
+
+Rules:
+- Adjust the vibe profile based on the refinement, NOT replace it entirely
+- If they say "more acoustic" — increase acousticness, shift search queries toward acoustic artists
+- If they say "darker" — lower valence, shift colors darker, adjust mood label
+- If they say "more energy" — increase energyLevel, tempo, danceability
+- If they say "less mainstream" — shift mainstream queries toward indie/alternative artists
+- Keep the colorPalette coherent — adjust it to match the refined mood
+- Generate ENTIRELY NEW searchQueries that reflect the refined vibe — don't reuse the old ones
+- The moodLabel should subtly shift to reflect the refinement
+- spotifyGenres MUST be from: acoustic, ambient, blues, chill, classical, country, dance, electronic, emo, folk, funk, grunge, hip-hop, house, indie, indie-pop, jazz, metal, new-age, piano, pop, punk, r-n-b, rainy-day, rock, sad, singer-songwriter, sleep, soul, study, synth-pop, trip-hop`,
+      },
+      {
+        role: 'user',
+        content: `Original feeling: "${originalInput}"
+
+Current vibe profile:
+${JSON.stringify(currentVibe, null, 2)}
+
+User's refinement: "${refinement}"
+
+Return ONLY a valid JSON object with the FULL updated vibe profile (same structure as the current one). Adjust all fields that the refinement affects. Generate completely new searchQueries. No markdown, no backticks, just JSON.`,
+      },
+    ],
+  })
+
+  const text = response.choices[0]?.message?.content ?? ''
+  const parsed = safeParseJson<VibeProfile>(text)
+
+  if (!parsed) {
+    throw new Error('Failed to parse refined vibe profile')
+  }
+
+  return parsed
+}
+
 type TrackInput = {
   source: 'spotify' | 'audius'
   track: SpotifyTrackData | AudiusTrack
