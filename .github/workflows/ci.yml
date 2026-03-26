@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check required env vars documented
+        run: |
+          for var in GROQ_API_KEY GEMINI_API_KEY SPOTIFY_CLIENT_ID SPOTIFY_CLIENT_SECRET NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY; do
+            grep -q "$var" .env.example || (echo "Missing $var in .env.example" && exit 1)
+          done
+
+      - name: Lint
+        run: npx next lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npx next build
+        env:
+          GROQ_API_KEY: dummy
+          GEMINI_API_KEY: dummy
+          SPOTIFY_CLIENT_ID: dummy
+          SPOTIFY_CLIENT_SECRET: dummy
+          NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy

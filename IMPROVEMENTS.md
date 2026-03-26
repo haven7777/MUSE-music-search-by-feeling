@@ -19,9 +19,9 @@
 - [x] **3.2 Image optimization** — Added loading="lazy" + decoding="async" to all album art images
 - [x] **3.3 Bundle analysis** — Verified: all heavy deps are server-only or tree-shakeable, no issues
 
-### Batch 4: CI/CD (HIGH IMPACT, LOW EFFORT)
-- [ ] **4.1 GitHub Actions workflow** — Lint + type-check + build on every push/PR
-- [ ] **4.2 Add .env.example validation** — Fail build if required env vars are missing
+### Batch 4: CI/CD (HIGH IMPACT, LOW EFFORT) ✅ DONE
+- [x] **4.1 GitHub Actions workflow** — Lint + type-check + build on push/PR to main
+- [x] **4.2 Add .env.example validation** — CI step verifies all 6 env vars are documented
 
 ### Batch 5: Testing (HIGH IMPACT, HIGH EFFORT)
 - [ ] **5.1 Setup Vitest** — Install and configure for the Next.js project
