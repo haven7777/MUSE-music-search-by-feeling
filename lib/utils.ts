@@ -53,6 +53,17 @@ export function sanitizeTitle(title: string): string {
   return clean.length >= 2 ? clean : title.trim()
 }
 
+/** Retry an async function once after a delay on failure */
+export async function withRetry<T>(fn: () => Promise<T>, retries = 1, delayMs = 1000): Promise<T> {
+  try {
+    return await fn()
+  } catch (err) {
+    if (retries <= 0) throw err
+    await new Promise((r) => setTimeout(r, delayMs))
+    return withRetry(fn, retries - 1, delayMs * 2)
+  }
+}
+
 export function truncateTitle(title: string, maxLen = 45): string {
   const clean = sanitizeTitle(title)
   if (clean.length <= maxLen) return clean

@@ -17,6 +17,7 @@ import { MoodChips } from '@/components/home/MoodChips'
 import { ProcessingState } from '@/components/home/ProcessingState'
 import { ResultsPage } from '@/components/results/ResultsPage'
 import { useAudio } from '@/components/shared/AudioContext'
+import { useToast } from '@/components/shared/Toast'
 import { getPlaylistByIdCloud } from '@/lib/cloudStorage'
 
 function HomePageInner() {
@@ -32,6 +33,7 @@ function HomePageInner() {
   const refreshCountRef = useRef(0)
   const didAutoSubmit = useRef(false)
   const { pause } = useAudio()
+  const { showToast } = useToast()
 
   useEffect(() => {
     if (didAutoSubmit.current) return
@@ -228,7 +230,7 @@ function HomePageInner() {
     try {
       await runPipeline(playlist.originalInput, playlist.vibeProfile, { offset, excludeIds })
     } catch {
-      // silently fail — user can try again
+      showToast('Could not refresh songs. Try again.', 'error')
     } finally {
       setIsRefreshing(false)
     }
@@ -254,7 +256,7 @@ function HomePageInner() {
       refreshCountRef.current = 0
       await runPipeline(playlist.originalInput, refinedVibe)
     } catch {
-      // silently fail — user can try again
+      showToast('Refinement failed. Try a different phrase.', 'error')
     } finally {
       setIsRefining(false)
     }

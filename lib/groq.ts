@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk'
 import { AudiusTrack, RankedTrack, SpotifyTrackData, VibeProfile } from '@/types'
+import { withRetry } from '@/lib/utils'
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
@@ -7,6 +8,14 @@ const MODEL = 'llama-3.3-70b-versatile'
 
 function stripJsonFences(text: string): string {
   return text.replace(/```json?\n?/g, '').replace(/```/g, '').trim()
+}
+
+/** Sanitize user input before interpolating into LLM prompts to prevent prompt injection */
+function sanitizeForPrompt(text: string): string {
+  return text
+    .replace(/["""]/g, "'")       // Normalize quotes to prevent breaking out of quoted context
+    .replace(/\n{3,}/g, '\n\n')   // Collapse excessive newlines
+    .slice(0, 500)                 // Hard length cap
 }
 
 function safeParseJson<T>(text: string): T | null {
@@ -18,7 +27,7 @@ function safeParseJson<T>(text: string): T | null {
 }
 
 export async function decodeVibe(input: string): Promise<VibeProfile> {
-  const response = await groq.chat.completions.create({
+  const response = await withRetry(() => groq.chat.completions.create({
     model: MODEL,
     temperature: 0.7,
     response_format: { type: 'json_object' },
@@ -58,7 +67,7 @@ Audio parameters guidance:
       {
         role: 'user',
         content: `The user described this feeling or moment:
-"${input}"
+"${sanitizeForPrompt(input)}"
 
 Return ONLY a valid JSON object matching this exact structure. No markdown, no backticks, no explanation, just JSON:
 {
@@ -110,7 +119,7 @@ Color rules:
 - Energetic moods: electric blue, violet, lime`,
       },
     ],
-  })
+  }))
 
   const text = response.choices[0]?.message?.content ?? ''
   const parsed = safeParseJson<VibeProfile>(text)
@@ -123,7 +132,7 @@ Color rules:
 }
 
 export async function refineVibe(currentVibe: VibeProfile, originalInput: string, refinement: string): Promise<VibeProfile> {
-  const response = await groq.chat.completions.create({
+  const response = await withRetry(() => groq.chat.completions.create({
     model: MODEL,
     temperature: 0.7,
     response_format: { type: 'json_object' },
@@ -145,17 +154,17 @@ Rules:
       },
       {
         role: 'user',
-        content: `Original feeling: "${originalInput}"
+        content: `Original feeling: "${sanitizeForPrompt(originalInput)}"
 
 Current vibe profile:
 ${JSON.stringify(currentVibe, null, 2)}
 
-User's refinement: "${refinement}"
+User's refinement: "${sanitizeForPrompt(refinement)}"
 
 Return ONLY a valid JSON object with the FULL updated vibe profile (same structure as the current one). Adjust all fields that the refinement affects. Generate completely new searchQueries. No markdown, no backticks, just JSON.`,
       },
     ],
-  })
+  }))
 
   const text = response.choices[0]?.message?.content ?? ''
   const parsed = safeParseJson<VibeProfile>(text)
@@ -203,7 +212,7 @@ export async function rankTracks(
     })
     .join('\n\n')
 
-  const response = await groq.chat.completions.create({
+  const response = await withRetry(() => groq.chat.completions.create({
     model: MODEL,
     temperature: 0.8,
     messages: [
@@ -213,7 +222,7 @@ export async function rankTracks(
       },
       {
         role: 'user',
-        content: `The user felt: "${originalInput}"
+        content: `The user felt: "${sanitizeForPrompt(originalInput)}"
 Their emotional profile: ${JSON.stringify({ emotionalCore: vibeProfile.emotionalCore, energyLevel: vibeProfile.energyLevel, valenceTarget: vibeProfile.valenceTarget, sonicTexture: vibeProfile.sonicTexture, moodLabel: vibeProfile.moodLabel })}
 
 Here are the candidate tracks:
@@ -234,7 +243,7 @@ Order by fit with the feeling (rank 1 = best match).
 Include ALL tracks provided. No markdown, just JSON array.`,
       },
     ],
-  })
+  }))
 
   const text = response.choices[0]?.message?.content ?? ''
   const rankResults = safeParseJson<RankResult[]>(text)
@@ -266,10 +275,10 @@ const VISION_MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
 
 export async function decodeVibeFromImage(imageBase64: string, mimeType: string, textHint?: string): Promise<VibeProfile> {
   const imagePrompt = textHint
-    ? `The user uploaded this image and said: "${textHint}". Analyze the mood, atmosphere, colors, and emotional tone of this image combined with their words.`
+    ? `The user uploaded this image and said: "${sanitizeForPrompt(textHint)}". Analyze the mood, atmosphere, colors, and emotional tone of this image combined with their words.`
     : `Analyze the mood, atmosphere, colors, and emotional tone of this image.`
 
-  const response = await groq.chat.completions.create({
+  const response = await withRetry(() => groq.chat.completions.create({
     model: VISION_MODEL,
     temperature: 0.7,
     max_tokens: 2000,
@@ -319,7 +328,7 @@ spotifyGenres MUST be from: acoustic, ambient, blues, chill, classical, country,
         ],
       },
     ],
-  })
+  }))
 
   const text = response.choices[0]?.message?.content ?? ''
   const parsed = safeParseJson<VibeProfile>(text)
