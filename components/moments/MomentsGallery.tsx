@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Trash2, ExternalLink } from 'lucide-react'
+import { Trash2, ExternalLink, Play, Pause } from 'lucide-react'
 import { FavoriteTrack, MusePlaylist } from '@/types'
 import { clearAllPlaylistsCloud, clearAllFavoriteTracksCloud, deletePlaylistCloud, getPlaylistsCloud, getFavoriteTracksCloud, removeFavoriteTrackCloud } from '@/lib/cloudStorage'
 import { useToast } from '@/components/shared/Toast'
 import { useAuth } from '@/components/auth/AuthContext'
+import { useAudio } from '@/components/shared/AudioContext'
 import { MomentCardSkeleton, SavedSongSkeleton } from '@/components/shared/LoadingSkeleton'
 import { MomentThumbnail } from './MomentThumbnail'
 
@@ -19,6 +20,7 @@ export function MomentsGallery() {
   const [dataLoading, setDataLoading] = useState(true)
   const { showToast } = useToast()
   const { user, loading: authLoading } = useAuth()
+  const { play, pause: pauseAudio, currentTrackId, isPlaying } = useAudio()
   const router = useRouter()
   const MAX = 50
 
@@ -217,42 +219,63 @@ export function MomentsGallery() {
             )}
           </div>
 
-          <div className="flex flex-col gap-2">
-            {savedSongs.map((song) => (
+          <div className="flex flex-col gap-2.5">
+            {savedSongs.map((song) => {
+              const audioSrc = song.source === 'audius' ? song.streamUrl : song.previewUrl
+              const isCurrent = currentTrackId === `saved-${song.id}`
+              const isCurrentPlaying = isCurrent && isPlaying
+              return (
               <div
                 key={song.id}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.75rem',
+                  gap: '0.9rem',
                   background: 'var(--depth-2)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: '12px',
-                  padding: '0.5rem 0.75rem',
+                  border: `1px solid ${isCurrent ? 'rgba(255,255,255,0.2)' : 'var(--glass-border)'}`,
+                  borderRadius: '14px',
+                  padding: '0.65rem 0.9rem',
                 }}
               >
-                {/* Artwork */}
-                <div style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, background: 'var(--muse-surface)' }}>
+                {/* Artwork with play overlay */}
+                <div
+                  style={{ width: '52px', height: '52px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: 'var(--muse-surface)', position: 'relative', cursor: audioSrc ? 'pointer' : 'default' }}
+                  onClick={() => {
+                    if (!audioSrc) return
+                    if (isCurrentPlaying) { pauseAudio() } else { play(`saved-${song.id}`, audioSrc) }
+                  }}
+                >
                   {song.coverArt ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={song.coverArt} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>🎵</div>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>🎵</div>
+                  )}
+                  {audioSrc && (
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: isCurrentPlaying ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      opacity: isCurrentPlaying ? 1 : 0,
+                      transition: 'opacity 0.15s ease',
+                    }} className="group-song-overlay">
+                      {isCurrentPlaying ? <Pause size={18} color="white" /> : <Play size={18} color="white" style={{ marginLeft: '2px' }} />}
+                    </div>
                   )}
                 </div>
 
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--muse-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--muse-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {song.title}
                   </p>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {song.artist}
                   </p>
                 </div>
 
                 {/* Actions */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
                   {song.spotifyUrl && (
                     <a
                       href={song.spotifyUrl}
@@ -263,7 +286,7 @@ export function MomentsGallery() {
                       style={{ padding: '8px', borderRadius: '8px', color: '#1DB954', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                       className="hover:bg-white/10 active:bg-white/15 transition-colors"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
                   {song.source === 'audius' && (
@@ -276,7 +299,7 @@ export function MomentsGallery() {
                       style={{ padding: '8px', borderRadius: '8px', color: '#CC0FE0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                       className="hover:bg-white/10 active:bg-white/15 transition-colors"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
                   <button
@@ -286,12 +309,17 @@ export function MomentsGallery() {
                     style={{ padding: '8px', borderRadius: '8px', color: 'var(--text-muted)', display: 'flex', background: 'none', border: 'none', cursor: 'pointer', alignItems: 'center', justifyContent: 'center' }}
                     className="hover:bg-white/10 active:bg-white/15 transition-colors"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
+          <style>{`
+            .group-song-overlay { opacity: 0; }
+            div:hover > .group-song-overlay { opacity: 1 !important; }
+          `}</style>
         </section>
       )}
 
@@ -354,7 +382,7 @@ export function MomentsGallery() {
             </div>
           )}
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {playlists.map((playlist, i) => (
               <MomentThumbnail
                 key={playlist.id}

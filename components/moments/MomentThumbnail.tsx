@@ -33,11 +33,11 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index, compac
         style={{
           background: 'var(--depth-2)',
           border: '1px solid var(--glass-border)',
-          borderRadius: '12px',
+          borderRadius: '14px',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.75rem',
-          padding: '0.5rem 0.75rem',
+          gap: '0.9rem',
+          padding: '0.65rem 0.9rem',
         }}
         onClick={handleClick}
         role="button"
@@ -47,24 +47,24 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index, compac
         whileHover={{ y: -1, transition: { duration: 0.15 } }}
       >
         {/* Color dot */}
-        <div style={{ width: '40px', height: '40px', borderRadius: '8px', flexShrink: 0, background: `linear-gradient(135deg, ${colorPalette.primary}, ${colorPalette.secondary})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'white', fontFamily: 'var(--font-syne)' }}>
+        <div style={{ width: '52px', height: '52px', borderRadius: '10px', flexShrink: 0, background: `linear-gradient(135deg, ${colorPalette.primary}, ${colorPalette.secondary})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'white', fontFamily: 'var(--font-syne)' }}>
             {tracks.length}
           </span>
         </div>
 
         {/* Info */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontWeight: 700, fontSize: '0.88rem', color: colorPalette.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-syne)' }}>
+          <p style={{ fontWeight: 700, fontSize: '0.95rem', color: colorPalette.primary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'var(--font-syne)' }}>
             {moodLabel}
           </p>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontStyle: 'italic' }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontStyle: 'italic' }}>
             &ldquo;{originalInput}&rdquo;
           </p>
         </div>
 
         {/* Actions — always visible */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flexShrink: 0 }}>
           <button
             onClick={(e) => { e.stopPropagation(); onReexplore(originalInput) }}
             aria-label="Re-explore this feeling"
@@ -72,7 +72,7 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index, compac
             style={{ padding: '8px', borderRadius: '8px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             className="hover:bg-white/10 active:bg-white/15 transition-colors"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-4 h-4" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onDelete(id) }}
@@ -81,7 +81,7 @@ export function MomentThumbnail({ playlist, onDelete, onReexplore, index, compac
             style={{ padding: '8px', borderRadius: '8px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             className="hover:bg-white/10 active:bg-white/15 transition-colors"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </motion.div>
