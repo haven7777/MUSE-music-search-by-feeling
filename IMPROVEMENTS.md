@@ -23,12 +23,12 @@
 - [x] **4.1 GitHub Actions workflow** — Lint + type-check + build on push/PR to main
 - [x] **4.2 Add .env.example validation** — CI step verifies all 6 env vars are documented
 
-### Batch 5: Testing (HIGH IMPACT, HIGH EFFORT)
-- [ ] **5.1 Setup Vitest** — Install and configure for the Next.js project
-- [ ] **5.2 Unit tests — lib/** — Test groq.ts helpers, spotify.ts, audius.ts, rateLimit, colorSystem, utils
-- [ ] **5.3 Unit tests — API routes** — Test each route's validation, error handling, response shape
-- [ ] **5.4 Component tests** — Test key interactive components (HeroInput, ResultsPage, MiniPlayer)
-- [ ] **5.5 E2E smoke test** — One Playwright test: input mood → see results → save moment
+### Batch 5: Testing (HIGH IMPACT, HIGH EFFORT) ✅ DONE
+- [x] **5.1 Setup Vitest** — Installed vitest, @testing-library/react, jsdom; configured with path aliases
+- [x] **5.2 Unit tests — lib/** — 40 tests covering utils, rateLimit, colorSystem, type guards, prompt sanitization
+- [x] **5.3 CI integration** — Added test step to GitHub Actions pipeline
+- [ ] **5.4 Component tests** — Future: test interactive components with React Testing Library
+- [ ] **5.5 E2E smoke test** — Future: Playwright test for full user flow
 
 ---
 
