@@ -55,9 +55,9 @@ function mapAudiusTrack(raw: AudiusRawTrack): AudiusTrack {
   }
 }
 
-export async function searchAudiusTracks(query: string, limit = 10): Promise<AudiusRawTrack[]> {
+export async function searchAudiusTracks(query: string, limit = 10, offset = 0): Promise<AudiusRawTrack[]> {
   try {
-    const url = `${AUDIUS_BASE}/tracks/search?query=${encodeURIComponent(query)}&limit=${limit}`
+    const url = `${AUDIUS_BASE}/tracks/search?query=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`
     const res = await fetch(url, {
       headers: { Accept: 'application/json' },
       signal: AbortSignal.timeout(8000),
@@ -84,10 +84,12 @@ function buildFallbackQueries(queries: string[]): string[] {
 export async function fetchAudiusTracks(
   queries: string[],
   inputIsLatin = true,
+  offset = 0,
+  excludeIds: Set<string> = new Set(),
 ): Promise<AudiusTrack[]> {
-  const rawResults = await Promise.all(queries.map((q) => searchAudiusTracks(q, 20)))
+  const rawResults = await Promise.all(queries.map((q) => searchAudiusTracks(q, 20, offset)))
 
-  const seen = new Set<string>()
+  const seen = new Set<string>(excludeIds)
   let allRaw: AudiusRawTrack[] = []
 
   for (const tracks of rawResults) {
@@ -102,7 +104,7 @@ export async function fetchAudiusTracks(
   if (allRaw.length < 8) {
     const fallbackQueries = buildFallbackQueries(queries)
     const fallbackResults = await Promise.all(
-      fallbackQueries.map((q) => searchAudiusTracks(q, 15)),
+      fallbackQueries.map((q) => searchAudiusTracks(q, 15, offset)),
     )
     for (const tracks of fallbackResults) {
       for (const track of tracks) {

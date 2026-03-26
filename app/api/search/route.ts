@@ -18,18 +18,19 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as { vibeProfile?: VibeProfile; originalInput?: string }
-    const { vibeProfile, originalInput } = body
+    const body = (await request.json()) as { vibeProfile?: VibeProfile; originalInput?: string; offset?: number; excludeIds?: string[] }
+    const { vibeProfile, originalInput, offset, excludeIds } = body
 
     if (!vibeProfile?.searchQueries) {
       return NextResponse.json({ error: 'Invalid vibe profile' }, { status: 400 })
     }
 
     const inputIsLatin = isLatinInput(originalInput ?? '')
+    const excludeSet = new Set(excludeIds ?? [])
 
     const [spotify, audius] = await Promise.all([
-      fetchSpotifyTracks(vibeProfile.searchQueries.mainstream, vibeProfile, inputIsLatin).catch(() => []),
-      fetchAudiusTracks(vibeProfile.searchQueries.underground, inputIsLatin).catch(() => []),
+      fetchSpotifyTracks(vibeProfile.searchQueries.mainstream, vibeProfile, inputIsLatin, offset ?? 0, excludeSet).catch(() => []),
+      fetchAudiusTracks(vibeProfile.searchQueries.underground, inputIsLatin, offset ?? 0, excludeSet).catch(() => []),
     ])
 
     return NextResponse.json({ spotify, audius })

@@ -27,6 +27,8 @@ function HomePageInner() {
   const [processingKeywords, setProcessingKeywords] = useState<string[]>([])
   const [playlist, setPlaylist] = useState<MusePlaylist | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const refreshCountRef = useRef(0)
   const didAutoSubmit = useRef(false)
   const { pause } = useAudio()
 
@@ -65,7 +67,7 @@ function HomePageInner() {
     }
   }, [phase])
 
-  async function runPipeline(input: string, vibeProfile: VibeProfile) {
+  async function runPipeline(input: string, vibeProfile: VibeProfile, options?: { offset?: number; excludeIds?: string[] }) {
     const keywords = [vibeProfile.emotionalCore, ...vibeProfile.sonicTexture.slice(0, 4)]
       keywords.forEach((kw, i) => {
         setTimeout(() => {
@@ -77,7 +79,7 @@ function HomePageInner() {
       const searchRes = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vibeProfile, originalInput: input }),
+        body: JSON.stringify({ vibeProfile, originalInput: input, offset: options?.offset, excludeIds: options?.excludeIds }),
       })
 
       if (!searchRes.ok) throw new Error('Music search failed')
@@ -130,8 +132,8 @@ function HomePageInner() {
           return good.length >= floor ? good : tracks.slice(0, Math.max(floor, good.length))
         }
         rankedTracks = [
-          ...filterWithFloor(spotifyRanked, 4),
-          ...filterWithFloor(audiusRanked, 4),
+          ...filterWithFloor(spotifyRanked, 6),
+          ...filterWithFloor(audiusRanked, 6),
         ].sort((a, b) => a.rank - b.rank)
       } else {
         rankedTracks = allTracks.map((t, i) => ({
@@ -213,6 +215,21 @@ function HomePageInner() {
         : "Something didn't click this time. Try a different photo."
       setErrorMessage(friendly)
       setPhase('error')
+    }
+  }
+
+  async function handleRefresh() {
+    if (!playlist || isRefreshing) return
+    setIsRefreshing(true)
+    refreshCountRef.current += 1
+    const excludeIds = playlist.tracks.map((t) => t.track.id)
+    const offset = refreshCountRef.current * 10
+    try {
+      await runPipeline(playlist.originalInput, playlist.vibeProfile, { offset, excludeIds })
+    } catch {
+      // silently fail — user can try again
+    } finally {
+      setIsRefreshing(false)
     }
   }
 
@@ -375,7 +392,7 @@ function HomePageInner() {
                 Saved ♫
               </Link>
             </div>
-            <ResultsPage playlist={playlist} />
+            <ResultsPage playlist={playlist} onRefresh={handleRefresh} isRefreshing={isRefreshing} />
           </motion.div>
         )}
 

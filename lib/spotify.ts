@@ -46,8 +46,8 @@ function isLatinScript(text: string): boolean {
   return nonLatinCount / letters.length < 0.3
 }
 
-export async function searchTracks(query: string, token: string): Promise<SpotifyRawTrack[]> {
-  const params = new URLSearchParams({ q: query, type: 'track', limit: '10' })
+export async function searchTracks(query: string, token: string, offset = 0): Promise<SpotifyRawTrack[]> {
+  const params = new URLSearchParams({ q: query, type: 'track', limit: '10', offset: String(offset) })
   const url = `https://api.spotify.com/v1/search?${params.toString()}`
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -204,11 +204,13 @@ export async function fetchSpotifyTracks(
   queries: string[],
   vibeProfile: VibeProfile,
   inputIsLatin = true,
+  offset = 0,
+  excludeIds: Set<string> = new Set(),
 ): Promise<SpotifyTrackData[]> {
   const token = await getSpotifyToken()
 
-  const rawResults = await Promise.all(queries.map((q) => searchTracks(q, token)))
-  const seen = new Set<string>()
+  const rawResults = await Promise.all(queries.map((q) => searchTracks(q, token, offset)))
+  const seen = new Set<string>(excludeIds)
   let allRaw: SpotifyRawTrack[] = []
 
   for (const results of rawResults) {
@@ -222,7 +224,7 @@ export async function fetchSpotifyTracks(
 
   if (allRaw.length < 16) {
     const fallbackQueries = buildSpotifyFallback(vibeProfile)
-    const fallbackResults = await Promise.all(fallbackQueries.map((q) => searchTracks(q, token)))
+    const fallbackResults = await Promise.all(fallbackQueries.map((q) => searchTracks(q, token, offset)))
     for (const results of fallbackResults) {
       for (const track of results) {
         if (!seen.has(track.id)) {
