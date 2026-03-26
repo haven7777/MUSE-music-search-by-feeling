@@ -1,5 +1,5 @@
 import Groq from 'groq-sdk'
-import { AudiusTrack, RankedTrack, SpotifyTrackData, VibeProfile } from '@/types'
+import { AudiusTrack, RankedTrack, SpotifyTrackData, VibeProfile, isSpotifyTrack } from '@/types'
 import { withRetry } from '@/lib/utils'
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
@@ -195,19 +195,16 @@ export async function rankTracks(
 ): Promise<RankedTrack[]> {
   const trackDescriptions = tracks
     .map((t) => {
-      const isSpotify = t.source === 'spotify'
       const track = t.track
 
-      if (isSpotify) {
-        const s = track as SpotifyTrackData
-        const featStr = s.audioFeatures
-          ? `Energy: ${s.audioFeatures.energy.toFixed(2)}, Valence: ${s.audioFeatures.valence.toFixed(2)}, Danceability: ${s.audioFeatures.danceability.toFixed(2)}`
+      if (isSpotifyTrack(track)) {
+        const featStr = track.audioFeatures
+          ? `Energy: ${track.audioFeatures.energy.toFixed(2)}, Valence: ${track.audioFeatures.valence.toFixed(2)}, Danceability: ${track.audioFeatures.danceability.toFixed(2)}`
           : 'Audio features unavailable'
-        return `[SPOTIFY] ID:${s.id} "${s.title}" by ${s.artist}\n  ${featStr}`
+        return `[SPOTIFY] ID:${track.id} "${track.title}" by ${track.artist}\n  ${featStr}`
       } else {
-        const a = track as AudiusTrack
-        const tagsStr = a.tags.length > 0 ? a.tags.join(', ') : 'none'
-        return `[AUDIUS] ID:${a.id} "${a.title}" by ${a.artist}\n  Plays: ${a.playCount}, Tags: ${tagsStr}`
+        const tagsStr = track.tags.length > 0 ? track.tags.join(', ') : 'none'
+        return `[AUDIUS] ID:${track.id} "${track.title}" by ${track.artist}\n  Plays: ${track.playCount}, Tags: ${tagsStr}`
       }
     })
     .join('\n\n')

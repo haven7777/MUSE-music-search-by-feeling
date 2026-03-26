@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Bookmark, ExternalLink } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { AudiusTrack, SpotifyTrackData, TrackCardProps } from '@/types'
+import { TrackCardProps, isSpotifyTrack, isAudiusTrack } from '@/types'
 import { truncateTitle } from '@/lib/utils'
 import { useAudio } from '@/components/shared/AudioContext'
 import { addFavoriteTrackCloud, removeFavoriteTrackCloud, isFavoriteTrackCloud } from '@/lib/cloudStorage'
@@ -34,10 +34,9 @@ function AudiusIcon() {
 export function TrackCard({ rankedTrack, index, moodLabel, onOpen }: TrackCardProps) {
   const { source, track } = rankedTrack
   const { currentTrackId, isPlaying } = useAudio()
-  const isSpotify = source === 'spotify'
-
-  const spotifyTrack = isSpotify ? (track as SpotifyTrackData) : null
-  const audiusTrack = !isSpotify ? (track as AudiusTrack) : null
+  const spotifyTrack = isSpotifyTrack(track) ? track : null
+  const audiusTrack = isAudiusTrack(track) ? track : null
+  const isSpotify = !!spotifyTrack
 
   const rawTitle = track.title
   const displayTitle = truncateTitle(rawTitle)

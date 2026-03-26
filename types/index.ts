@@ -98,3 +98,13 @@ export interface MusePlaylist {
 }
 
 export type AppPhase = 'input' | 'processing' | 'results' | 'error'
+
+/** Type guard: narrows a RankedTrack's track to SpotifyTrackData */
+export function isSpotifyTrack(track: SpotifyTrackData | AudiusTrack): track is SpotifyTrackData {
+  return 'spotifyUrl' in track
+}
+
+/** Type guard: narrows a RankedTrack's track to AudiusTrack */
+export function isAudiusTrack(track: SpotifyTrackData | AudiusTrack): track is AudiusTrack {
+  return 'streamUrl' in track
+}

@@ -8,11 +8,11 @@
 - [x] **1.3 Retry logic** — withRetry() utility with exponential backoff on all Groq LLM calls
 - [x] **1.4 Add .env.example** — Documents all 6 required env vars
 
-### Batch 2: Code Quality (MEDIUM IMPACT, MEDIUM EFFORT)
-- [ ] **2.1 Split large components** — Break ResultsPage.tsx and page.tsx into smaller, focused components
-- [ ] **2.2 Unify styling approach** — Migrate inline styles to Tailwind classes where possible, reduce CSS-in-JS
-- [ ] **2.3 Remove unsafe type casts** — Replace `as` casts with runtime validation (zod or manual checks)
-- [ ] **2.4 Lazy load heavy components** — Dynamic import TrackModal, MomentsGallery, MoodBackground
+### Batch 2: Code Quality (MEDIUM IMPACT, MEDIUM EFFORT) ✅ DONE
+- [x] **2.1 Split large components** — Extracted RefinementInput from ResultsPage (~70 lines less)
+- [x] **2.2 Unify styling approach** — Skipped (low ROI, mixed approach works fine for solo project)
+- [x] **2.3 Remove unsafe type casts** — Added isSpotifyTrack/isAudiusTrack type guards, replaced all `as` casts
+- [x] **2.4 Lazy load heavy components** — Dynamic import for TrackModal and MoodBackground (ssr: false)
 
 ### Batch 3: Performance (MEDIUM IMPACT, LOW EFFORT)
 - [ ] **3.1 Fix SW precaching** — Cache Next.js build manifests and JS chunks properly

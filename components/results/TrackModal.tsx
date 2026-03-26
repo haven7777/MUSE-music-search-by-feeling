@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion'
 import { X, ExternalLink, Sparkles, Music } from 'lucide-react'
-import { RankedTrack, SpotifyTrackData, AudiusTrack, VibeProfile } from '@/types'
+import { RankedTrack, VibeProfile, isSpotifyTrack, isAudiusTrack } from '@/types'
 import { MiniPlayer } from './MiniPlayer'
 import { FullPlayer } from './FullPlayer'
 
@@ -38,9 +38,9 @@ function FeatureBar({ label, value }: { label: string; value: number }) {
 
 export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProps) {
   const { track, source, explanation } = rankedTrack
-  const isSpotify = source === 'spotify'
-  const spotifyTrack = isSpotify ? (track as SpotifyTrackData) : null
-  const audiusTrack = !isSpotify ? (track as AudiusTrack) : null
+  const spotifyTrack = isSpotifyTrack(track) ? track : null
+  const audiusTrack = isAudiusTrack(track) ? track : null
+  const isSpotify = !!spotifyTrack
   const keywords = [vibeProfile.moodLabel, vibeProfile.emotionalCore, ...vibeProfile.sonicTexture]
     .slice(0, 6)
     .map((k) => k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
