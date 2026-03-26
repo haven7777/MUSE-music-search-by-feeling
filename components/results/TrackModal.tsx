@@ -37,10 +37,9 @@ function FeatureBar({ label, value }: { label: string; value: number }) {
 }
 
 export function TrackModal({ rankedTrack, vibeProfile, onClose }: TrackModalProps) {
-  const { track, source, explanation } = rankedTrack
+  const { track, explanation } = rankedTrack
   const spotifyTrack = isSpotifyTrack(track) ? track : null
   const audiusTrack = isAudiusTrack(track) ? track : null
-  const isSpotify = !!spotifyTrack
   const keywords = [vibeProfile.moodLabel, vibeProfile.emotionalCore, ...vibeProfile.sonicTexture]
     .slice(0, 6)
     .map((k) => k.charAt(0).toUpperCase() + k.slice(1).toLowerCase())
