@@ -171,6 +171,16 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* dvh fallback — fixes Android address bar viewport jump */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.h-screen {
+  height: 100vh;
+  height: 100dvh;
+}
+
 /* Prevent 300ms tap delay on interactive elements */
 a, button, [role="button"], input, textarea, select {
   touch-action: manipulation;
