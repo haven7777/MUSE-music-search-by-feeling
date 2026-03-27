@@ -17,6 +17,16 @@
 
 ---
 
+## Screenshots
+
+![Home page](screenshots/Home%20page.png)
+
+![Search results](screenshots/Search%20results.png)
+
+![Saved Moments](screenshots/Saved%20music%3Amoments.png)
+
+---
+
 ## The Problem
 
 Every music app asks you to pick a genre, tap a mood button, or browse a pre-made playlist. "Chill vibes." "Workout." "Focus." These aren't feelings. They're categories.
