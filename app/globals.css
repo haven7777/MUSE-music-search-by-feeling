@@ -166,7 +166,7 @@ body {
   height: 100%;
   background: transparent;
   color: var(--muse-text, var(--text-primary));
-  overscroll-behavior-y: contain;
+  overscroll-behavior: none;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
 }
