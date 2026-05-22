@@ -8,6 +8,7 @@
 ```
 
 ### Describe a feeling. Discover its soundtrack.
+🌐 Live demo: https://muse-music-search-by-feeling.vercel.app
 
 [![Deploy with Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=flat-square&logo=vercel)](https://vercel.com)
 ![Next.js](https://img.shields.io/badge/Next.js_14-black?style=flat-square&logo=next.js)
